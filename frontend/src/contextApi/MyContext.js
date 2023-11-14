@@ -51,7 +51,7 @@ export const ContextProvider = ({ children }) => {
     return handleUpdateNodes();
   }, [selectedNodes])
 
-  console.log(updatedNodes)
+  //console.log(updatedNodes)
 
  
 

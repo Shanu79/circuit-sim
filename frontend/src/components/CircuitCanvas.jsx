@@ -50,6 +50,8 @@ const CircuitCanvas = () => {
     setRunSim,
     selectedNodes,
     setSelectedNodes,
+    updatedNodes,
+    setUpdatedNodes
   } = useMyContext();
   const svgRef = React.createRef();
   const numRows = 6;
@@ -195,28 +197,41 @@ const CircuitCanvas = () => {
         </ComponentList>
       </Menu>
 
+      {/* {console.log(selectedNodes)} */}
+
       <CircuitBoaard>
-        <svg ref={svgRef} width={totalWidth} height={totalHeight}>
-          {/* Render dots in a grid */}
-          {Array.from({ length: numRows }).map((_, row) =>
-            Array.from({ length: numCols }).map((_, col) => (
-              <Circle
-                key={`dot-${row}-${col}`}
-                id={`dot-${row}-${col}`}
-                cx={col * (2 * dotRadius + gap) + dotRadius}
-                cy={row * (2 * dotRadius + gap) + dotRadius}
-                r={dotRadius}
-                fill={
-                  connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
-                }
-                onClick={() => handleDotClick(`${row}-${col}`)}
-                onMouseOver={(e) => e.target.setAttribute("r", dotRadius + 2)}
-                onMouseOut={(e) => e.target.setAttribute("r", dotRadius)}
-              />
-            ))
-          )}
-        </svg>
-      </CircuitBoaard>
+  <svg ref={svgRef} width={totalWidth} height={totalHeight}>
+    {/* Render dots and text in a grid */}
+    {Array.from({ length: numRows }).map((_, row) =>
+      Array.from({ length: numCols }).map((_, col) => (
+        <g key={`group-${row}-${col}`}>
+          <Circle
+            key={`dot-${row}-${col}`}
+            id={`dot-${row}-${col}`}
+            cx={col * (2 * dotRadius + gap) + dotRadius}
+            cy={row * (2 * dotRadius + gap) + dotRadius}
+            r={dotRadius}
+            fill={
+              connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
+            }
+            onClick={() => handleDotClick(`${row}-${col}`)}
+            onMouseOver={(e) => e.target.setAttribute("r", dotRadius + 2)}
+            onMouseOut={(e) => e.target.setAttribute("r", dotRadius)}
+          />
+          {/* Add text in the center of the circle */}
+          <text
+            x={col * (2 * dotRadius + gap) + dotRadius}
+            y={row * (2 * dotRadius + gap) + dotRadius}
+            
+            fill="black" // Set the color of the text
+          >
+            {selectedNodes.get(`${row}-${col}`)}
+          </text>
+        </g>
+      ))
+    )}
+  </svg>
+</CircuitBoaard>
 
       {/* Button to remove lines */}
     </Container>
