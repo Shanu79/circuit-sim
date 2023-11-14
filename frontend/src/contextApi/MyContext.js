@@ -52,7 +52,7 @@ export const ContextProvider = ({ children }) => {
   console.log(netstring);
   console.log(updatedNodes);
 
-  const body = { netList: netstring , numberNodes: updatedNodes.size};
+  const body = { netList: netstring , numberNodes: updatedNodes.size,};
 
 fetch('http://localhost:5000/', {
   method: 'POST', // or 'GET' or any other HTTP method you need

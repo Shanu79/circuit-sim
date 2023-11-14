@@ -6,5 +6,6 @@ a = Circuit(netlist)
 
 
 
-print(-a[5].v)
+print(-a[2].v)
+print(a.I(1))
 
