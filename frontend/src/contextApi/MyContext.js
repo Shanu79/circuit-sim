@@ -19,6 +19,8 @@ export const ContextProvider = ({ children }) => {
 
   const [runSim, setRunSim] = useState(false);
 
+  const [simData, setSimData] = useState("");
+
   
 
   useEffect(()=>{
@@ -62,7 +64,10 @@ fetch('http://localhost:5000/', {
   body: JSON.stringify(body),
 })
   .then(response => response.json())
-  .then(data => console.log(data))
+  .then(data => {
+    console.log(data);
+    setSimData(data);
+  })
   .catch(error => console.error('Error: ', error));
 }
 
@@ -101,7 +106,8 @@ fetch('http://localhost:5000/', {
         setRunSim,
         updatedNodes, 
         setUpdatedNodes,
-        netStringFunc
+        netStringFunc,
+        simData
         
       }}
     >

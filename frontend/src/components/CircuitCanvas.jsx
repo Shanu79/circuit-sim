@@ -53,20 +53,23 @@ const CircuitCanvas = () => {
     setSelectedLine,
     selectedComponent,
     setSelectedComponent,
-    runSim,
-    setRunSim,
+    // runSim,
+    // setRunSim,
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
-    netStringFunc
+    netStringFunc,
+    simData
   } = useMyContext();
 
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
   const [isTooltipVisible, setTooltipVisible] = useState(false);
+  const [toolTipDotId, setToolTipDotId] = useState("");
 
   const showTooltip = (event, dotId) => {
     setTooltipPosition({ x: event.clientX, y: event.clientY });
     setTooltipVisible(true);
+    setToolTipDotId(dotId);
   };
 
   const hideTooltip = () => {
@@ -295,7 +298,7 @@ const CircuitCanvas = () => {
               boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
             }}
           >
-            {tooltipPosition.x}, {tooltipPosition.y}
+            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(toolTipDotId) ? updatedNodes.get(toolTipDotId) : 'not in circuit'}`]) || 'NODE' }
           </div>
           )}
         </div>

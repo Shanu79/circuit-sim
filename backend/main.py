@@ -50,7 +50,12 @@ def simulate():
          node_voltages_dict[key] = value + " V"
 
         print(node_voltages_dict)
-        return jsonify(str(node_voltages_dict)+"\n"+str(la.mesh_equations())+"\n"+str(la.matrix_equations()))
+        # return jsonify(str(node_voltages_dict)+"\n"+str(la.mesh_equations())+"\n"+str(la.matrix_equations()))
+        return {
+                "node_voltages": node_voltages_dict,
+                "meshEqn": str(la.mesh_equations()),
+                "matrixEqn": str(la.matrix_equations())
+            }
         
     except Exception as e:
         # Handle exceptions properly and return an error response
