@@ -2,12 +2,13 @@ import React, { createContext, useContext, useEffect, useState} from "react";
 // import * as d3 from 'd3'
 
 const MyContext = createContext();
-
+let netstring ="";
 export const ContextProvider = ({ children }) => {
   const [connectedDots, setConnectedDots] = useState([]);
   const [lines, setLines] = useState([]); // State variable to track lines
   const [selectedLine, setSelectedLine] = useState();
-  const [selectedComponent, setSelectedComponent] = useState('wire')
+  const [selectedComponent, setSelectedComponent] = useState('W')
+  
 
   const [selectedNodes, setSelectedNodes] = useState(new Map()); // to select nodes that are part of the schematics
 
@@ -18,23 +19,9 @@ export const ContextProvider = ({ children }) => {
 
   const [runSim, setRunSim] = useState(false);
 
-  useEffect(()=>{
+  const [simData, setSimData] = useState("");
 
-    const convertToNetlist = ()=>{
-
-      let netList = ""
-
-      lines.forEach(line=>{
-        netList += (line + " " + updatedNodes.get(line.split('_')[1]) + " " + updatedNodes.get(line.split('_')[2]) + " 2 " + "\n" )
-      })
-
-      return netList
-    }
-
-    if(runSim){
-       //CALL API HERE
-    }
-  },[runSim, lines, updatedNodes])
+  
 
   useEffect(()=>{
     const handleUpdateNodes = ()=>{
@@ -45,6 +32,8 @@ export const ContextProvider = ({ children }) => {
         newMap.set(key, i);
         i++;
       }
+
+      
   
       setUpdatedNodes(newMap);
     }
@@ -54,7 +43,33 @@ export const ContextProvider = ({ children }) => {
   //console.log(updatedNodes)
 
  
+ const netStringFunc = () => {
+   netstring = ""; // Define netstring variable
+  window.valMap.forEach((value, key) => {
+    if(key.charAt(0)==="W"){netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + "\n")}
+    else
+    {netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + " " + value + "\n");}
+  });
+  
+  console.log(netstring);
+  console.log(updatedNodes);
 
+  const body = { netList: netstring , numberNodes: updatedNodes.size,};
+
+fetch('http://localhost:5000/', {
+  method: 'POST', // or 'GET' or any other HTTP method you need
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(body),
+})
+  .then(response => response.json())
+  .then(data => {
+    console.log(data);
+    setSimData(data);
+  })
+  .catch(error => console.error('Error: ', error));
+}
 
   const [circuit, setCircuit] = useState([
     {
@@ -91,6 +106,9 @@ export const ContextProvider = ({ children }) => {
         setRunSim,
         updatedNodes, 
         setUpdatedNodes,
+        netStringFunc,
+        simData
+        
       }}
     >
       {children}
@@ -100,4 +118,6 @@ export const ContextProvider = ({ children }) => {
 
 export const useMyContext = ()=>{
     return useContext(MyContext);
+    
 }
+

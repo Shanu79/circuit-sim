@@ -3,6 +3,8 @@ import styled from "styled-components";
 import * as d3 from "d3";
 import { components } from "../assets/componentsLibrary";
 import { useMyContext } from "../contextApi/MyContext";
+// import { updatedNodes } from "../contextApi/MyContext";
+import { useState } from "react";
 
 //STYLED COMPONENTS
 const Container = styled.main`
@@ -34,8 +36,13 @@ const Circle = styled.circle`
     cursor: pointer;
   }
 `;
-
+// const Text = styled.text
+window.valMap = new Map();
+// let netstring = "";
 const tempnetList = [];
+
+
+
 const CircuitCanvas = () => {
   const {
     connectedDots,
@@ -46,13 +53,31 @@ const CircuitCanvas = () => {
     setSelectedLine,
     selectedComponent,
     setSelectedComponent,
-    runSim,
-    setRunSim,
+    // runSim,
+    // setRunSim,
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
-    setUpdatedNodes
+    setUpdatedNodes,
+    netStringFunc,
+    simData
   } = useMyContext();
+
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+  const [toolTipDotId, setToolTipDotId] = useState("");
+
+  const showTooltip = (event, dotId) => {
+    setTooltipPosition({ x: event.clientX, y: event.clientY });
+    setTooltipVisible(true);
+    setToolTipDotId(dotId);
+  };
+
+  const hideTooltip = () => {
+    setTooltipVisible(false);
+  };
+
+
   const svgRef = React.createRef();
   const numRows = 6;
   const numCols = 10;
@@ -69,8 +94,11 @@ const CircuitCanvas = () => {
 
       if (row1 === row2 || col1 === col2) {
         // Second dot clicked in the same row or column, connect the dots
-        const lineId = connectDots(connectedDots[0], dotId); // Get the unique line ID
+        const lineId = connectDots(connectedDots[0], dotId);
+         // Get the unique line ID
         setLines([...lines, lineId]);
+        if(lineId.charAt(0)==="W")
+        {window.valMap.set(lineId,0)}
         // Add line ID to state
 
         setConnectedDots([]);
@@ -96,13 +124,14 @@ const CircuitCanvas = () => {
     const y1 = +dot1.attr("cy");
     const x2 = +dot2.attr("cx");
     const y2 = +dot2.attr("cy");
-
+    
     const lineId = `${selectedComponent}_${dotId1}_${dotId2}`; // Generate a unique line ID
 
     components[selectedComponent].component(
       svg,
       lineId,
       handleLineClick,
+      handleLineDoubleClick,
       x1,
       x2,
       y1,
@@ -123,6 +152,8 @@ const CircuitCanvas = () => {
     return lineId; // Return the line's unique ID
   };
 
+  
+  
   // Function to remove a line by its ID
   const removeLine = (lineId) => {
     const svg = d3.select(svgRef.current);
@@ -144,12 +175,28 @@ const CircuitCanvas = () => {
     dot2 > 1 ? newMap.set(dotId2, dot2 - 1) : newMap.delete(dotId2);
 
     setSelectedNodes(newMap);
-    // Remove the line's ID from state
+    window.valMap.delete(lineId);
   };
 
   // Calculate the total width and height of the grid
   const totalWidth = numCols * (2 * dotRadius + gap);
   const totalHeight = numRows * (2 * dotRadius + gap);
+
+   
+
+  const handleLineDoubleClick = (lineId, value) => {
+    const newValue = prompt(`Update the value for the component ${lineId} to:`, value);
+  
+    if (newValue !== null) {
+      // Handle the updated value as needed
+      
+      window.valMap.set(lineId, newValue);
+      
+    }
+
+    
+
+  };
 
 
 
@@ -179,7 +226,10 @@ const CircuitCanvas = () => {
             netlist at console
           </Button>
 
-          <Button onClick={() => setRunSim(!runSim)}>Run Simulation</Button>
+          <Button onClick={netStringFunc}>Run Simulation</Button>
+          <Button onClick={() => window.valMap.forEach((value, key) => {
+    console.log(`${key} => ${value}`);
+  })}>Lock Circuit</Button>
           
         </RemoveComponent>
 
@@ -220,12 +270,12 @@ const CircuitCanvas = () => {
           />
           {/* Add text in the center of the circle */}
           <text
-            x={col * (2 * dotRadius + gap) + dotRadius}
-            y={row * (2 * dotRadius + gap) + dotRadius}
-            
-            fill="black" // Set the color of the text
+            x={col * (2 * dotRadius + gap) + dotRadius +7} // Adjust the x-coordinate as needed
+            y={row * (2 * dotRadius + gap) + dotRadius + 10} // Adjust the y-coordinate as needed
+            fill="grey" // Adjust the text color as needed
+            fontSize="9" // Adjust the font size as needed
           >
-            {selectedNodes.get(`${row}-${col}`)}
+            {updatedNodes.get(`${row}-${col}`)}
           </text>
         </g>
       ))
@@ -237,5 +287,6 @@ const CircuitCanvas = () => {
     </Container>
   );
 };
+
 
 export default CircuitCanvas;

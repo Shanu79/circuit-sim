@@ -1,7 +1,11 @@
 from lcapy import Circuit
 
-netlist = "V 1 0 6; down=1.5 \n R1 1 2 2; right=1.5 \n R2 2 0_2 4; down \n W 0 0_2; right"
+netlist = "V_2-3_1-3 0 1 6\nR_1-3_1-4 1 2 2\nR_1-4_2-4 2 3 2\nR_2-4_2-3 3 0 2\n"
 
 a = Circuit(netlist)
 
-print(a[2].v)
+
+
+print(-a[2].v)
+print(a.I(1))
+
