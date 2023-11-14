@@ -3,7 +3,8 @@ import styled from "styled-components";
 import * as d3 from "d3";
 import { components } from "../assets/componentsLibrary";
 import { useMyContext } from "../contextApi/MyContext";
-import { updatedNodes } from "../contextApi/MyContext";
+// import { updatedNodes } from "../contextApi/MyContext";
+import { useState } from "react";
 
 //STYLED COMPONENTS
 const Container = styled.main`
@@ -35,10 +36,13 @@ const Circle = styled.circle`
     cursor: pointer;
   }
 `;
-const Text = styled.text
+// const Text = styled.text
 window.valMap = new Map();
-let netstring = "";
+// let netstring = "";
 const tempnetList = [];
+
+
+
 const CircuitCanvas = () => {
   const {
     connectedDots,
@@ -56,6 +60,20 @@ const CircuitCanvas = () => {
     updatedNodes,
     netStringFunc
   } = useMyContext();
+
+  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
+  const [isTooltipVisible, setTooltipVisible] = useState(false);
+
+  const showTooltip = (event, dotId) => {
+    setTooltipPosition({ x: event.clientX, y: event.clientY });
+    setTooltipVisible(true);
+  };
+
+  const hideTooltip = () => {
+    setTooltipVisible(false);
+  };
+
+
   const svgRef = React.createRef();
   const numRows = 6;
   const numCols = 10;
@@ -226,6 +244,7 @@ const CircuitCanvas = () => {
       </Menu>
       
       <CircuitBoaard>
+        <div>
         <svg ref={svgRef} width={totalWidth} height={totalHeight}>
           {/* Render dots and text in a grid */}
           {Array.from({ length: numRows }).map((_, row) =>
@@ -241,8 +260,14 @@ const CircuitCanvas = () => {
                     connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
                   }
                   onClick={() => handleDotClick(`${row}-${col}`)}
-                  onMouseOver={(e) => e.target.setAttribute("r", dotRadius + 2)}
-                  onMouseOut={(e) => e.target.setAttribute("r", dotRadius)}
+                  onMouseOver={(e) => {
+                    e.target.setAttribute("r", dotRadius + 2);
+                    showTooltip(e, `${row}-${col}`);
+                  }}
+                  onMouseOut={(e) => {
+                    e.target.setAttribute("r", dotRadius);
+                    hideTooltip();
+                  }}
                 />
                 <text
                   x={col * (2 * dotRadius + gap) + dotRadius +7} // Adjust the x-coordinate as needed
@@ -255,7 +280,25 @@ const CircuitCanvas = () => {
               </g>
             ))
           )}
+           
         </svg>
+        {/* Render tooltip conditionally */}
+        {isTooltipVisible && (
+            <div
+            style={{
+              position: "absolute",
+              left: `${tooltipPosition.x + 20}px`,
+              top: `${tooltipPosition.y + 20}px`,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              padding: "5px",
+              borderRadius: "5px",
+              boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            {tooltipPosition.x}, {tooltipPosition.y}
+          </div>
+          )}
+        </div>
       </CircuitBoaard>
 
       {/* Button to remove lines */}
