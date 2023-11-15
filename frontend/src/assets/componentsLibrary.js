@@ -95,6 +95,25 @@ export const components = {
                         .on("mouseout", ()=> hideLineCurrent())
             
     },
-    
+
+    ACSource: {
+        id: 6,
+        name: 'ACSource',
+        component: (svg, lineId, setSelectedLine,handleLineDoubleClick,showLineCurrent, hideLineCurrent, x1, x2, y1, y2) => (
+            svg.append("path")
+            .attr("id", lineId)
+            .attr("d", "M -50,25.000005 L 0,25.000005 C 0,25.000005 1.5,20.000004 4.5,20.000004 C 7.5,20.000004 10.5,30.000006 13.5,30.000006 C 16.5,30.000006 18,25.000005 18,25.000005 L 60,25.000005")
+            .attr("stroke", "black")
+            .attr("stroke-width", "3")
+            .attr("stroke-linejoin", "bevel")
+            .attr("fill", "none")
+             
+            .attr("transform", " rotate("+(x1===x2?Math.sign(y2-y1):(x2>x1?0:-2))*90+" "+x1+" "+y1+") "+`translate(${x1+50},${y1-25})`)
+            .on("click", () => setSelectedLine(lineId))
+            .on("dblclick", () => handleLineDoubleClick(lineId, 0))
+            
+        )
+    }
+
 }
 

@@ -48,6 +48,11 @@ export const ContextProvider = ({ children }) => {
    netstring = ""; // Define netstring variable
     valMap.forEach((value, key) => {
     if(key.charAt(0)==="W"){netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + "\n")}
+    else if(key.charAt(0)==="A")
+    { 
+      netstring += ("V"+key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + ` {${value}* sin(3*t)}` +"\n")}
+    else if(key.charAt(0)==="L")
+    {netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + " " + value +' 0'+ "\n");}
     else
     {netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + " " + value + "\n");}
   });

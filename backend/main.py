@@ -4,6 +4,8 @@ from flask_cors import CORS
 from lcapy import Circuit
 from lcapy import TimeDomainVoltage
 from lcapy import LoopAnalysis
+from lcapy import s
+
 
 
 import re
@@ -29,22 +31,13 @@ def simulate():
         # Create an lcapy Circuit object and solve the circuit
         a = Circuit(netstring)
         
-        print(a.dc())
-        la = LoopAnalysis(a)
-        
-        la.matrix_equations()
-
-        
-        print("mc")
-        print(a.transient())
-        print("mc")
-        
         node_voltages_dict = {}
         for i in range(numberOfNodes):
          key = "Node "+str(i)  # Create a key based on the loop variable
          
+        #  value = str(a[i].V(s)) #For Ac analysis
          value = str(-a[i].v)
-         
+         print(value)
     
          # Assign the value to the key in the dictionary
          node_voltages_dict[key] = value + " V"
