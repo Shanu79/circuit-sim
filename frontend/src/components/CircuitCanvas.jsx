@@ -249,7 +249,7 @@ const CircuitCanvas = () => {
     const result = (numerator / denominator);
 
     // Round to exactly two decimal places
-    return Number(result.toFixed(2));
+    return result;
     } else {
       // If it's not a fraction, convert it to a number
       return parseFloat(input);
@@ -272,7 +272,7 @@ const CircuitCanvas = () => {
   // console.log(updatedNodes.get(lineId.split('_')[2]))
   console.log(valMap.get(lineId))
   console.log(current)
-  return current
+  return Math.round(current * 100 ) / 100
 
  }
 
