@@ -266,8 +266,14 @@ const CircuitCanvas = () => {
               connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
             }
             onClick={() => handleDotClick(`${row}-${col}`)}
-            onMouseOver={(e) => e.target.setAttribute("r", dotRadius + 2)}
-            onMouseOut={(e) => e.target.setAttribute("r", dotRadius)}
+            onMouseOver={(e) => {
+              e.target.setAttribute("r", dotRadius + 2);
+              showTooltip(e, `${row}-${col}`);
+            }}
+            onMouseOut={(e) => {
+              e.target.setAttribute("r", dotRadius);
+              hideTooltip();
+            }}
           />
           {/* Add text in the center of the circle */}
           <text
