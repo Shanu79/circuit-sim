@@ -75,7 +75,7 @@ const CircuitCanvas = () => {
   const [lineCurrentPos, setLineCurrentPos] = useState({ x: 0, y: 0 });
   const [isLineCurrentVisible, setLineCurrentVisible] = useState(false);
   const [LineCurrentId, setLineCurrentDotId] = useState("");
-  const [lineCurrentValue, setLineCurrentValue] = useState("");
+  // const [lineCurrentValue, setLineCurrentValue] = useState("");
 
 
 
