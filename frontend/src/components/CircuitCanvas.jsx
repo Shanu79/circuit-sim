@@ -53,7 +53,7 @@ const CircuitCanvas = () => {
     setSelectedLine,
     selectedComponent,
     setSelectedComponent,
-    // runSim,
+    runSim,
     // setRunSim,
     selectedNodes,
     setSelectedNodes,
@@ -62,18 +62,38 @@ const CircuitCanvas = () => {
     simData
   } = useMyContext();
 
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [isTooltipVisible, setTooltipVisible] = useState(false);
-  const [toolTipDotId, setToolTipDotId] = useState("");
+  const [NodeVoltagePosition, setNodeVoltagePosition] = useState({ x: 0, y: 0 });
+  const [isNodeVoltageVisible, setNodeVoltageVisible] = useState(false);
+  const [NodeVoltageDotId, setNodeVoltageDotId] = useState("");
 
-  const showTooltip = (event, dotId) => {
-    setTooltipPosition({ x: event.clientX, y: event.clientY });
-    setTooltipVisible(true);
-    setToolTipDotId(dotId);
+  const [lineCurrentPos, setLineCurrentPos] = useState({ x: 0, y: 0 });
+  const [isLineCurrentVisible, setLineCurrentVisible] = useState(false);
+  const [LineCurrentId, setLineCurrentDotId] = useState("");
+  const [lineCurrentValue, setLineCurrentValue] = useState("")
+
+  const showLineCurrent = (e, lineId) =>{
+    setLineCurrentPos({x: e.clientX , y: e.clientY});
+    setLineCurrentVisible(true);
+    setLineCurrentDotId(lineId);
+    console.log(lineId)
+  
+    
+  }
+
+  const hideLineCurrent = ()=>{
+    setLineCurrentVisible(false);
+  }
+
+  const showNodeVoltage = (event, dotId) => {
+    setNodeVoltagePosition({ x: event.clientX, y: event.clientY });
+    setNodeVoltageVisible(true);
+    setNodeVoltageDotId(dotId);
+
+    
   };
 
-  const hideTooltip = () => {
-    setTooltipVisible(false);
+  const hideNodeVoltage = () => {
+    setNodeVoltageVisible(false);
   };
 
 
@@ -131,6 +151,8 @@ const CircuitCanvas = () => {
       lineId,
       handleLineClick,
       handleLineDoubleClick,
+      showLineCurrent,
+      hideLineCurrent,
       x1,
       x2,
       y1,
@@ -196,6 +218,8 @@ const CircuitCanvas = () => {
     
 
   };
+
+ 
 
 
 
@@ -265,11 +289,11 @@ const CircuitCanvas = () => {
                   onClick={() => handleDotClick(`${row}-${col}`)}
                   onMouseOver={(e) => {
                     e.target.setAttribute("r", dotRadius + 2);
-                    showTooltip(e, `${row}-${col}`);
+                    showNodeVoltage(e, `${row}-${col}`);
                   }}
                   onMouseOut={(e) => {
                     e.target.setAttribute("r", dotRadius);
-                    hideTooltip();
+                    hideNodeVoltage();
                   }}
                 />
                 <text
@@ -285,21 +309,37 @@ const CircuitCanvas = () => {
           )}
            
         </svg>
-        {/* Render tooltip conditionally */}
-        {isTooltipVisible && (
+        {/* Render NodeVoltage conditionally */}
+        {isNodeVoltageVisible && (
             <div
             style={{
               position: "absolute",
-              left: `${tooltipPosition.x + 20}px`,
-              top: `${tooltipPosition.y + 20}px`,
+              left: `${NodeVoltagePosition.x + 20}px`,
+              top: `${NodeVoltagePosition.y + 20}px`,
               backgroundColor: "rgba(255, 255, 255, 0.9)",
               padding: "5px",
               borderRadius: "5px",
               boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
             }}
           >
-            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(toolTipDotId) ? updatedNodes.get(toolTipDotId) : 'not in circuit'}`]) || 'NODE' }
+            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(NodeVoltageDotId) ? updatedNodes.get(NodeVoltageDotId) : 'not in circuit'}`]) || 'NODE' }
           </div>
+          )}
+
+          {isLineCurrentVisible && (
+            <div
+             style={{
+              position: "absolute",
+              left: `${lineCurrentPos.x - 10}px`,
+              top: `${lineCurrentPos.y - 40 }px`,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              padding: "5px",
+              borderRadius: "5px",
+              boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
+             }}
+            >
+              
+            </div>
           )}
         </div>
       </CircuitBoaard>
