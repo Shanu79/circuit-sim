@@ -40,8 +40,8 @@ export const ContextProvider = ({ children }) => {
     return handleUpdateNodes();
   }, [selectedNodes])
 
- // console.log(updatedNodes)
-  
+  //console.log(updatedNodes)
+
  
  const netStringFunc = () => {
    netstring = ""; // Define netstring variable

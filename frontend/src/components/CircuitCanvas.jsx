@@ -58,6 +58,7 @@ const CircuitCanvas = () => {
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
+    setUpdatedNodes,
     netStringFunc,
     simData
   } = useMyContext();
@@ -269,7 +270,9 @@ const CircuitCanvas = () => {
           </Select>
         </ComponentList>
       </Menu>
-      
+
+      {/* {console.log(selectedNodes)} */}
+
       <CircuitBoaard>
         <div>
         <svg ref={svgRef} width={totalWidth} height={totalHeight}>
