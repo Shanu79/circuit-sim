@@ -250,6 +250,7 @@ const CircuitCanvas = () => {
       {/* {console.log(selectedNodes)} */}
 
       <CircuitBoaard>
+        <div>
   <svg ref={svgRef} width={totalWidth} height={totalHeight}>
     {/* Render dots and text in a grid */}
     {Array.from({ length: numRows }).map((_, row) =>
@@ -281,7 +282,24 @@ const CircuitCanvas = () => {
       ))
     )}
   </svg>
-</CircuitBoaard>
+        {/* Render tooltip conditionally */}
+        {isTooltipVisible && (
+            <div
+            style={{
+              position: "absolute",
+              left: `${tooltipPosition.x + 20}px`,
+              top: `${tooltipPosition.y + 20}px`,
+              backgroundColor: "rgba(255, 255, 255, 0.9)",
+              padding: "5px",
+              borderRadius: "5px",
+              boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(toolTipDotId) ? updatedNodes.get(toolTipDotId) : 'not in circuit'}`]) || 'NODE' }
+          </div>
+          )}
+        </div>
+      </CircuitBoaard>
 
       {/* Button to remove lines */}
     </Container>
