@@ -58,6 +58,7 @@ const CircuitCanvas = () => {
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
+    setUpdatedNodes,
     netStringFunc,
     simData
   } = useMyContext();
@@ -245,64 +246,42 @@ const CircuitCanvas = () => {
           </Select>
         </ComponentList>
       </Menu>
-      
+
+      {/* {console.log(selectedNodes)} */}
+
       <CircuitBoaard>
-        <div>
-        <svg ref={svgRef} width={totalWidth} height={totalHeight}>
-          {/* Render dots and text in a grid */}
-          {Array.from({ length: numRows }).map((_, row) =>
-            Array.from({ length: numCols }).map((_, col) => (
-              <g key={`group-${row}-${col}`}>
-                <Circle
-                  key={`dot-${row}-${col}`}
-                  id={`dot-${row}-${col}`}
-                  cx={col * (2 * dotRadius + gap) + dotRadius}
-                  cy={row * (2 * dotRadius + gap) + dotRadius}
-                  r={dotRadius}
-                  fill={
-                    connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
-                  }
-                  onClick={() => handleDotClick(`${row}-${col}`)}
-                  onMouseOver={(e) => {
-                    e.target.setAttribute("r", dotRadius + 2);
-                    showTooltip(e, `${row}-${col}`);
-                  }}
-                  onMouseOut={(e) => {
-                    e.target.setAttribute("r", dotRadius);
-                    hideTooltip();
-                  }}
-                />
-                <text
-                  x={col * (2 * dotRadius + gap) + dotRadius +7} // Adjust the x-coordinate as needed
-                  y={row * (2 * dotRadius + gap) + dotRadius + 10} // Adjust the y-coordinate as needed
-                  fill="grey" // Adjust the text color as needed
-                  fontSize="9" // Adjust the font size as needed
-                >
-                  {row}-{col}
-                </text>
-              </g>
-            ))
-          )}
-           
-        </svg>
-        {/* Render tooltip conditionally */}
-        {isTooltipVisible && (
-            <div
-            style={{
-              position: "absolute",
-              left: `${tooltipPosition.x + 20}px`,
-              top: `${tooltipPosition.y + 20}px`,
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              padding: "5px",
-              borderRadius: "5px",
-              boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
-            }}
+  <svg ref={svgRef} width={totalWidth} height={totalHeight}>
+    {/* Render dots and text in a grid */}
+    {Array.from({ length: numRows }).map((_, row) =>
+      Array.from({ length: numCols }).map((_, col) => (
+        <g key={`group-${row}-${col}`}>
+          <Circle
+            key={`dot-${row}-${col}`}
+            id={`dot-${row}-${col}`}
+            cx={col * (2 * dotRadius + gap) + dotRadius}
+            cy={row * (2 * dotRadius + gap) + dotRadius}
+            r={dotRadius}
+            fill={
+              connectedDots?.includes(`${row}-${col}`) ? "red" : "lightblue"
+            }
+            onClick={() => handleDotClick(`${row}-${col}`)}
+            onMouseOver={(e) => e.target.setAttribute("r", dotRadius + 2)}
+            onMouseOut={(e) => e.target.setAttribute("r", dotRadius)}
+          />
+          {/* Add text in the center of the circle */}
+          <text
+            x={col * (2 * dotRadius + gap) + dotRadius +7} // Adjust the x-coordinate as needed
+            y={row * (2 * dotRadius + gap) + dotRadius + 10} // Adjust the y-coordinate as needed
+            fill="grey" // Adjust the text color as needed
+            fontSize="9" // Adjust the font size as needed
           >
-            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(toolTipDotId) ? updatedNodes.get(toolTipDotId) : 'not in circuit'}`]) || 'NODE' }
-          </div>
-          )}
-        </div>
-      </CircuitBoaard>
+            {updatedNodes.get(`${row}-${col}`)}
+          </text>
+        </g>
+      ))
+    )}
+  </svg>
+</CircuitBoaard>
 
       {/* Button to remove lines */}
     </Container>
