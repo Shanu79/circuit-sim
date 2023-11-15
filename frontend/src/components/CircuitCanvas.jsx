@@ -397,7 +397,7 @@ const CircuitCanvas = () => {
             >
              {LineCurrentId.slice(0,1)}: { (valMap.get(LineCurrentId) || "no value") + " "}
 
-             {LineCurrentId.slice(0,1) === 'V' ? '' : `current: ${simData["node_voltages"] ? getCurrent(LineCurrentId) : ''}` }
+             {LineCurrentId.slice(0,1) === 'V' ? '' : `current: ${simData["node_voltages"] ? getCurrent(LineCurrentId) + 'A' : ''}` }
 
              
             </div>
