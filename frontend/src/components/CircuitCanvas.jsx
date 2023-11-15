@@ -20,7 +20,7 @@ const Menu = styled.section`
   margin-bottom: 20px;
 `;
 
-const CircuitBoaard = styled.section``;
+const CircuitBoard  = styled.section``;
 
 const RemoveComponent = styled.div``;
 
@@ -37,7 +37,6 @@ const Circle = styled.circle`
   }
 `;
 // const Text = styled.text
-window.valMap = new Map();
 // let netstring = "";
 const tempnetList = [];
 
@@ -60,8 +59,14 @@ const CircuitCanvas = () => {
     updatedNodes,
     setUpdatedNodes,
     netStringFunc,
-    simData
+    simData,
+    valMap,
+    setValMap
   } = useMyContext();
+
+
+  
+
 
   const [NodeVoltagePosition, setNodeVoltagePosition] = useState({ x: 0, y: 0 });
   const [isNodeVoltageVisible, setNodeVoltageVisible] = useState(false);
@@ -70,32 +75,11 @@ const CircuitCanvas = () => {
   const [lineCurrentPos, setLineCurrentPos] = useState({ x: 0, y: 0 });
   const [isLineCurrentVisible, setLineCurrentVisible] = useState(false);
   const [LineCurrentId, setLineCurrentDotId] = useState("");
-  const [lineCurrentValue, setLineCurrentValue] = useState("")
+  const [lineCurrentValue, setLineCurrentValue] = useState("");
 
-  const showLineCurrent = (e, lineId) =>{
-    setLineCurrentPos({x: e.clientX , y: e.clientY});
-    setLineCurrentVisible(true);
-    setLineCurrentDotId(lineId);
-    console.log(lineId)
-  
-    
-  }
 
-  const hideLineCurrent = ()=>{
-    setLineCurrentVisible(false);
-  }
 
-  const showNodeVoltage = (event, dotId) => {
-    setNodeVoltagePosition({ x: event.clientX, y: event.clientY });
-    setNodeVoltageVisible(true);
-    setNodeVoltageDotId(dotId);
 
-    
-  };
-
-  const hideNodeVoltage = () => {
-    setNodeVoltageVisible(false);
-  };
 
 
   const svgRef = React.createRef();
@@ -117,8 +101,12 @@ const CircuitCanvas = () => {
         const lineId = connectDots(connectedDots[0], dotId);
          // Get the unique line ID
         setLines([...lines, lineId]);
-        if(lineId.charAt(0)==="W")
-        {window.valMap.set(lineId,0)}
+        // if(lineId.charAt(0)==="W")
+        setValMap((valMap)=> {
+          const newMap = new Map(valMap)
+          newMap.set(lineId,1);
+          return newMap
+        })
         // Add line ID to state
 
         setConnectedDots([]);
@@ -134,6 +122,33 @@ const CircuitCanvas = () => {
     setSelectedLine(lineId);
   };
 
+  const showNodeVoltage = (event, dotId) => {
+    setNodeVoltagePosition({ x: event.clientX, y: event.clientY });
+    setNodeVoltageVisible(true);
+    setNodeVoltageDotId(dotId);
+
+    
+  };
+
+  const hideNodeVoltage = () => {
+    setNodeVoltageVisible(false);
+  };
+
+  const showLineCurrent = (e, lineId) =>{
+    setLineCurrentPos({x: e.clientX , y: e.clientY});
+    setLineCurrentVisible(true);
+    setLineCurrentDotId(lineId);
+    // console.log(lineId)
+    
+  }
+  
+  // console.log(lineCurrentValue)
+
+  const hideLineCurrent = ()=>{
+    setLineCurrentVisible(false);
+  }
+
+
   const connectDots = (dotId1, dotId2) => {
     // Use D3.js to draw a line between the two dots
     const svg = d3.select(svgRef.current);
@@ -146,6 +161,9 @@ const CircuitCanvas = () => {
     const y2 = +dot2.attr("cy");
     
     const lineId = `${selectedComponent}_${dotId1}_${dotId2}`; // Generate a unique line ID
+
+    
+
 
     components[selectedComponent].component(
       svg,
@@ -197,7 +215,13 @@ const CircuitCanvas = () => {
     dot2 > 1 ? newMap.set(dotId2, dot2 - 1) : newMap.delete(dotId2);
 
     setSelectedNodes(newMap);
-    window.valMap.delete(lineId);
+    // window.valMap.delete(lineId);
+
+    setValMap((valMap)=>{
+      const newMap = new Map(valMap);
+      newMap.delete(lineId)
+      return newMap;
+    })
   };
 
   // Calculate the total width and height of the grid
@@ -208,19 +232,49 @@ const CircuitCanvas = () => {
 
   const handleLineDoubleClick = (lineId, value) => {
     const newValue = prompt(`Update the value for the component ${lineId} to:`, value);
-  
     if (newValue !== null) {
       // Handle the updated value as needed
-      
-      window.valMap.set(lineId, newValue);
-      
+      // window.valMap.set(lineId, newValue);
+      setValMap((valMap)=> {
+        const newMap = new Map(valMap)
+        newMap.set(lineId,newValue);
+        return newMap
+      })
     }
-
-    
-
   };
+  function evaluateString(input) {
+    // Check if the string contains a fraction
+    if (input.includes('/')) {
+      const [numerator, denominator] = input.split('/').map(Number);
+    const result = (numerator / denominator);
+
+    // Round to exactly two decimal places
+    return Number(result.toFixed(2));
+    } else {
+      // If it's not a fraction, convert it to a number
+      return parseFloat(input);
+    }
+  }
+ const getCurrent = (lineId) =>{
+  const node1 = updatedNodes.get(lineId.split('_')[1]);
+  const node2 = updatedNodes.get(lineId.split('_')[2]);
+  let current = 0
+  if(simData){
+    const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2)
+    const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2)
+  
+    current = (evaluateString(node_1_Voltage) - evaluateString(node_2_Voltage)) / Number(valMap.get(lineId))
+    console.log(node_1_Voltage, node_2_Voltage)
+  }
 
  
+  
+  // console.log(updatedNodes.get(lineId.split('_')[2]))
+  console.log(valMap.get(lineId))
+  console.log(current)
+  return current
+
+ }
 
 
 
@@ -251,8 +305,8 @@ const CircuitCanvas = () => {
           </Button>
 
           <Button onClick={netStringFunc}>Run Simulation</Button>
-          <Button onClick={() => window.valMap.forEach((value, key) => {
-    console.log(`${key} => ${value}`);
+          <Button onClick={() => valMap.forEach((value, key) => {
+    console.log(`${key} => ${value}`) ;
   })}>Lock Circuit</Button>
           
         </RemoveComponent>
@@ -273,7 +327,7 @@ const CircuitCanvas = () => {
 
       {/* {console.log(selectedNodes)} */}
 
-      <CircuitBoaard>
+      <CircuitBoard >
         <div>
         <svg ref={svgRef} width={totalWidth} height={totalHeight}>
           {/* Render dots and text in a grid */}
@@ -341,11 +395,15 @@ const CircuitCanvas = () => {
               boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
              }}
             >
-              
+             {LineCurrentId.slice(0,1)}: { (valMap.get(LineCurrentId) || "no value") + " "}
+
+             {LineCurrentId.slice(0,1) === 'V' ? '' : `current: ${simData["node_voltages"] ? getCurrent(LineCurrentId) : ''}` }
+
+             
             </div>
           )}
         </div>
-      </CircuitBoaard>
+      </CircuitBoard >
 
       {/* Button to remove lines */}
     </Container>

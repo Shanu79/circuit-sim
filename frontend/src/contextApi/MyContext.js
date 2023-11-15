@@ -8,6 +8,7 @@ export const ContextProvider = ({ children }) => {
   const [lines, setLines] = useState([]); // State variable to track lines
   const [selectedLine, setSelectedLine] = useState();
   const [selectedComponent, setSelectedComponent] = useState('W')
+  const [valMap, setValMap] = useState(new Map())
   
 
   const [selectedNodes, setSelectedNodes] = useState(new Map()); // to select nodes that are part of the schematics
@@ -45,7 +46,7 @@ export const ContextProvider = ({ children }) => {
  
  const netStringFunc = () => {
    netstring = ""; // Define netstring variable
-  window.valMap.forEach((value, key) => {
+    valMap.forEach((value, key) => {
     if(key.charAt(0)==="W"){netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + "\n")}
     else
     {netstring += (key + " " + updatedNodes.get(key.split('_')[1]) + " " + updatedNodes.get(key.split('_')[2]) + " " + value + "\n");}
@@ -107,7 +108,9 @@ fetch('http://localhost:5000/', {
         updatedNodes, 
         setUpdatedNodes,
         netStringFunc,
-        simData
+        simData,
+        valMap,
+        setValMap
         
       }}
     >
