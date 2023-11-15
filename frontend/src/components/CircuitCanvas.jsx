@@ -260,8 +260,8 @@ const CircuitCanvas = () => {
   const node2 = updatedNodes.get(lineId.split('_')[2]);
   let current = 0
   if(simData){
-    const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2)
-    const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2)
+    const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2) 
+    const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2) 
   
     current = (evaluateString(node_1_Voltage) - evaluateString(node_2_Voltage)) / Number(valMap.get(lineId))
     console.log(node_1_Voltage, node_2_Voltage)
