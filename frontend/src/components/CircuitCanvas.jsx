@@ -40,8 +40,6 @@ const Circle = styled.circle`
 // let netstring = "";
 const tempnetList = [];
 
-
-
 const CircuitCanvas = () => {
   const {
     connectedDots,
@@ -64,10 +62,6 @@ const CircuitCanvas = () => {
     setValMap
   } = useMyContext();
 
-
-  
-
-
   const [NodeVoltagePosition, setNodeVoltagePosition] = useState({ x: 0, y: 0 });
   const [isNodeVoltageVisible, setNodeVoltageVisible] = useState(false);
   const [NodeVoltageDotId, setNodeVoltageDotId] = useState("");
@@ -76,11 +70,6 @@ const CircuitCanvas = () => {
   const [isLineCurrentVisible, setLineCurrentVisible] = useState(false);
   const [LineCurrentId, setLineCurrentDotId] = useState("");
   // const [lineCurrentValue, setLineCurrentValue] = useState("");
-
-
-
-
-
 
   const svgRef = React.createRef();
   const numRows = 6;
@@ -139,7 +128,6 @@ const CircuitCanvas = () => {
     setLineCurrentVisible(true);
     setLineCurrentDotId(lineId);
     // console.log(lineId)
-    
   }
   
   // console.log(lineCurrentValue)
@@ -161,9 +149,6 @@ const CircuitCanvas = () => {
     const y2 = +dot2.attr("cy");
     
     const lineId = `${selectedComponent}_${dotId1}_${dotId2}`; // Generate a unique line ID
-
-    
-
 
     components[selectedComponent].component(
       svg,
@@ -191,8 +176,6 @@ const CircuitCanvas = () => {
 
     return lineId; // Return the line's unique ID
   };
-
-  
   
   // Function to remove a line by its ID
   const removeLine = (lineId) => {
@@ -227,8 +210,6 @@ const CircuitCanvas = () => {
   // Calculate the total width and height of the grid
   const totalWidth = numCols * (2 * dotRadius + gap);
   const totalHeight = numRows * (2 * dotRadius + gap);
-
-   
 
   const handleLineDoubleClick = (lineId, value) => {
     const newValue = prompt(`Update the value for the component ${lineId} to:`, value);
@@ -267,16 +248,12 @@ const CircuitCanvas = () => {
     console.log(node_1_Voltage, node_2_Voltage)
   }
 
- 
-  
   // console.log(updatedNodes.get(lineId.split('_')[2]))
   console.log(valMap.get(lineId))
   console.log(current)
   return Math.round(current * 100 ) / 100
 
  }
-
-
 
   return (
     <Container>
@@ -359,7 +336,7 @@ const CircuitCanvas = () => {
                   fill="grey" // Adjust the text color as needed
                   fontSize="9" // Adjust the font size as needed
                 >
-                  {row}-{col}
+                  {updatedNodes.get(`${row}-${col}`)}
                 </text>
               </g>
             ))

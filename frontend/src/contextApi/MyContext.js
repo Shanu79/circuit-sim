@@ -22,8 +22,6 @@ export const ContextProvider = ({ children }) => {
 
   const [simData, setSimData] = useState("");
 
-  
-
   useEffect(()=>{
     const handleUpdateNodes = ()=>{
       const newMap = new Map()
@@ -33,17 +31,12 @@ export const ContextProvider = ({ children }) => {
         newMap.set(key, i);
         i++;
       }
-
-      
-  
       setUpdatedNodes(newMap);
     }
     return handleUpdateNodes();
   }, [selectedNodes])
 
   //console.log(updatedNodes)
-
- 
  const netStringFunc = () => {
    netstring = ""; // Define netstring variable
     valMap.forEach((value, key) => {
