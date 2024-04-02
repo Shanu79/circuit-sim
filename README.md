@@ -1,2 +1,2 @@
 # SparkCircuitry
-Research Project 1 for 7th semester, Electrical Engineering
+Research Project 2 for 8th semester, Electrical Engineering

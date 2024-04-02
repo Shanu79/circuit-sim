@@ -16,9 +16,8 @@ from matplotlib.pyplot import subplots, savefig
 
 #     # Create an lcapy Circuit object with the received circuit definition
 cct = Circuit("""
-V 0 1 step 30
-R 1 2 7
-C 2 3 1e-4
+V1 0 2 101
+R1 2 3 50
 """)
 
 # Simulate and plot the circuit response

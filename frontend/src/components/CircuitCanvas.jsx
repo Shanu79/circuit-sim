@@ -56,7 +56,11 @@ const CircuitCanvas = () => {
     setSelectedNodes,
     updatedNodes,
     setUpdatedNodes,
-    netStringFunc,
+    sendSimulationData, // Updated to use the new function name
+    analysisType,
+    setAnalysisType, // Allowing components to update the analysis type
+    frequency,
+    setFrequency,
     simData,
     valMap,
     setValMap
@@ -104,6 +108,11 @@ const CircuitCanvas = () => {
       // Clicked on the same dot, disconnect it
       setConnectedDots([]);
       // Remove the line (not shown in this example, you'll need to manage lines separately)
+    }
+
+    if(dotId in updatedNodes)
+    {
+
     }
   };
 
@@ -207,6 +216,14 @@ const CircuitCanvas = () => {
     })
   };
 
+  const setGroundNode = (nodeId) => {
+    // Check if nodeId is already in updatedNodes, then simply update its value to 0
+    updatedNodes.set(nodeId, 0);
+
+    console.log(`Node ${nodeId} set as ground.`);
+    console.log(updatedNodes);
+}
+
   // Calculate the total width and height of the grid
   const totalWidth = numCols * (2 * dotRadius + gap);
   const totalHeight = numRows * (2 * dotRadius + gap);
@@ -272,6 +289,16 @@ const CircuitCanvas = () => {
           </Button>
           <Button
             onClick={() => {
+              if (connectedDots && connectedDots[0]) {
+                  setGroundNode(connectedDots[0]);
+              } else {
+                  console.log("No node selected to set as ground.");
+              }
+          }}>
+            add Ground
+          </Button>
+          <Button
+            onClick={() => {
               console.log("New Netlist:");
               for (let i = 0; i < tempnetList.length; i++) {
                 console.log(tempnetList[i]);
@@ -280,8 +307,18 @@ const CircuitCanvas = () => {
           >
             netlist at console
           </Button>
-
-          <Button onClick={netStringFunc}>Run Simulation</Button>
+          <Select
+          value={analysisType}
+          onChange={(e) => setAnalysisType(e.target.value)}
+          aria-label="Select analysis type"
+        >
+          <option value="dc">DC Analysis</option>
+          <option value="ac">AC Analysis</option>
+          <option value="transient">Transient Analysis</option>
+          {/* Add other analysis types as needed */}
+        </Select>
+        <input type="text" id="frequency" name="frequency" placeholder="Frequency" value={frequency} onChange={(e)=>setFrequency(e.target.value)}/>
+          <Button onClick={sendSimulationData}>Run Simulation</Button>
           <Button onClick={() => valMap.forEach((value, key) => {
     console.log(`${key} => ${value}`) ;
   })}>Lock Circuit</Button>
