@@ -43,7 +43,7 @@ def simulate():
             value = comp.get('value', '')
 
             # You may need to adjust the format depending on your exact netlist format requirements
-            if type_prefix in ['AC Source', 'Inductor', 'Resistor', 'Wire','Generic']:
+            if type_prefix in ['AC Source', 'Inductor', 'Resistor', 'Wire', 'Capacitor', 'Generic']:
                 line = f"{id_} {node1} {node2} {value}\n"
                 cctt += line
 

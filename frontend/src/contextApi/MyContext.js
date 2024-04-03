@@ -41,37 +41,6 @@ export const ContextProvider = ({ children }) => {
     return handleUpdateNodes();
   }, [selectedNodes])
 
-  // console.log(updatedNodes)
-//  const sendSimulationData = () => {
-//   let netstring = `Circuit("""\n`;
-//   let acSourceCounter = 1;
-//   let rcounter = 1;
-//   let lcounter = 1; // Adjusted for consistency
-
-//   valMap.forEach((value, key) => {
-//     const node1 = updatedNodes.get(key.split('_')[1]);
-//     const node2 = updatedNodes.get(key.split('_')[2]);
-
-//     if(key.charAt(0) === "W") {
-//       // For Lcapy, explicit wires are not needed as connections are implied
-//       // Hence, we're not adding anything for 'W'
-//     } else if (key.charAt(0) === "A") {
-//       // Lcapy does not use the 'sin' prefix, specify AC sources differently
-//       netstring += `V${acSourceCounter} ${node1} ${node2} ${value}V;\\n`;
-//       acSourceCounter++;
-//     } else if(key.charAt(0) === "L") {
-//       netstring += `L${lcounter} ${node1} ${node2} ${value}H;\\n`;
-//       lcounter++;
-//     } else if(key.charAt(0) === "R") {
-//       netstring += `R${rcounter} ${node1} ${node2} ${value}ohm;\\n`;
-//       rcounter++;
-//     } else {
-//       // For other components, adjust accordingly. Example:
-//       netstring += `${key} ${node1} ${node2} ${value};\\n`;
-//     }
-//   });
-
-//   netstring += `""")\n`;
 const sendSimulationData = () => {
   const components = [];
 
@@ -89,31 +58,30 @@ const sendSimulationData = () => {
     };
 
     if (type === "A") {
-      const acSourceId = components.filter(comp => comp.type === 'AC Source').length + 1;
       component.type = 'AC Source';
-      component.id = `V${acSourceId}`;
-      // Assuming 'value' contains the frequency for the AC source
+      component.id = `V${components.filter(comp => comp.type === 'AC Source').length + 1}`;
       component.value = `{${value}*sin(2*pi*${frequency}*t)}`;
     } else if (type === "L") {
       component.type = 'Inductor';
       component.id = `L${components.filter(comp => comp.type === 'Inductor').length + 1}`;
       component.value = `${value}`;
+    } else if (type === "C") {
+      component.type = 'Capacitor';
+      component.id = `C${components.filter(comp => comp.type === 'Capacitor').length + 1}`;
+      component.value = `${value}`;
     } else if (type === "R") {
       component.type = 'Resistor';
       component.id = `R${components.filter(comp => comp.type === 'Resistor').length + 1}`;
       component.value = `${value}`;
-    } else if(type==="W")
-    {
+    } else if(type==="W"){
       component.type="Wire";
       component.id=`W${components.filter(comp=>comp.type==='Wire').length+1}`;
-    }
-     else {
+    } else {
       // Generic component or handle other specific cases
       component.type = 'Generic';
       component.id = key;
       component.value = value.toString(); // Ensure the value is a string
     }
-
     components.push(component);
   });
 

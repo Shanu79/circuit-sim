@@ -1,8 +1,10 @@
+from matplotlib import pyplot as plt
 from matplotlib.pyplot import figure, show, xlabel, ylabel, legend
 from lcapy import *
 from sympy import *
 import cmath
-from numpy import pi
+from cmath import polar
+import numpy as np
 
 def evaluate_complex_expression(expression):
     # Define a safe list of functions and constants
@@ -25,7 +27,6 @@ def evaluate_complex_expression(expression):
     # Ensure the result is treated as a complex number
     return complex(result)
 
-
 # Read the netlist string from the file
 netlist_filename = 'netlist.txt'
 with open(netlist_filename, 'r') as file:
@@ -34,14 +35,6 @@ with open(netlist_filename, 'r') as file:
 # Define the circuit with the read netlist
 cct = Circuit(netlist_string)
 
-# # Define an AC circuit
-# cct = Circuit("""
-# V1 0 1 {100 * sin(2 * pi * 50 * t)};
-# R1 1 2 5;
-# C1 2 3 400e-6;
-# L1 3 0 20e-3;
-# """)
-
 # Perform AC analysis by substituting source voltage and converting to frequency domain
 cct_ac = cct.ac()
 
@@ -49,7 +42,6 @@ cct_ac = cct.ac()
 VR_phasor = cct_ac.R1.v.phasor()
 VL_phasor = cct_ac.L1.v.phasor()
 VC_phasor = cct_ac.C1.v.phasor()
-# print(VL_phasor)
 
 e1=str(VR_phasor)
 e2=str(VC_phasor)
@@ -59,6 +51,11 @@ e3=str(VL_phasor)
 VR = evaluate_complex_expression(e1)
 VC = evaluate_complex_expression(e2)
 VL = evaluate_complex_expression(e3)
+
+# Output the result
+print(f"Vr: {VR}")
+print(f"Vl: {VL}")
+print(f"Vc: {VC}")
 
 # List of the complex numbers for iteration
 phasors = [VR, VC, VL]
@@ -84,65 +81,3 @@ ax.set_thetagrids(range(0, 360, 90), labels=['0°', '90°', '180°', '270°'])
 ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
 
 plt.show()
-
-# # Create a new figure for plotting
-# fig = figure()
-# ax = fig.add_subplot(1, 1, 1)
-
-# # Function to plot a phasor with arrowhead
-# def plot_phasor_with_arrow(ax, phasor, color, label):
-#     ax.quiver(0, 0, phasor.real, phasor.imag, angles='xy', scale_units='xy', scale=100, color=color, label=label)
-#     ax.text(phasor.real, phasor.imag, f'  {label}', verticalalignment='bottom')
-
-# # Plotting the phasors with arrowheads
-# plot_phasor_with_arrow(ax, r1, 'r', 'V_R')
-# plot_phasor_with_arrow(ax, r2, 'b', 'V_L')
-# plot_phasor_with_arrow(ax, r3, 'g', 'V_C')
-
-# # Adding features to the plot
-# ax.axhline(0, color='black', linewidth=0.5)
-# ax.axvline(0, color='black', linewidth=0.5)
-# ax.grid(color='gray', linestyle='--', linewidth=0.5)
-# xlabel('Real')
-# ylabel('Imaginary')
-# legend()
-
-# # Set the aspect of the plot to be equal, so circles appear as circles (important for phasor diagrams)
-# ax.set_aspect('equal')
-
-# # Display the plot
-# show()
-
-# # Create a new figure for plotting
-# fig = figure()
-# ax = fig.add_subplot(1, 1, 1)
-
-# # Plotting the phasors
-# # For VR
-# ax.plot(r1.real, r1.imag, 'ro', label='V_R')
-# # For VL
-# ax.plot(r2.real, r2.imag, 'bo', label='V_L')
-# # For VC
-# ax.plot(r3.real, r3.imag, 'go', label='V_C')
-
-# # Annotate the points
-# ax.text(r1.real, r1.imag, '  V_R', verticalalignment='bottom')
-# ax.text(r2.real, r2.imag, '  V_L', verticalalignment='bottom')
-# ax.text(r3.real, r3.imag, '  V_C', verticalalignment='bottom')
-
-# # Adding features to the plot
-# ax.axhline(0, color='black',linewidth=0.5)
-# ax.axvline(0, color='black',linewidth=0.5)
-# ax.grid(color = 'gray', linestyle = '--', linewidth = 0.5)
-# xlabel('Real')
-# ylabel('Imaginary')
-# legend()
-
-# # Display the plot
-# show()
-
-# Output the result
-print(f"Vr: {VR}")
-print(f"Vr: {VL}")
-print(f"Vr: {VC}")
-# phasor(VR).plot()
