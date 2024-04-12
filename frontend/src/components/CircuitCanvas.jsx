@@ -50,13 +50,12 @@ const CircuitCanvas = () => {
     setSelectedLine,
     selectedComponent,
     setSelectedComponent,
-    runSim,
-    // setRunSim,
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
     setUpdatedNodes,
     sendSimulationData, // Updated to use the new function name
+    viewSimulation,
     analysisType,
     setAnalysisType, // Allowing components to update the analysis type
     frequency,
@@ -254,21 +253,8 @@ const CircuitCanvas = () => {
     }
   }
  const getCurrent = (lineId) =>{
-  const node1 = updatedNodes.get(lineId.split('_')[1]);
-  const node2 = updatedNodes.get(lineId.split('_')[2]);
-  let current = 0
-  if(simData){
-    const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2) 
-    const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2) 
   
-    current = (evaluateString(node_1_Voltage) - evaluateString(node_2_Voltage)) / Number(valMap.get(lineId))
-    console.log(node_1_Voltage, node_2_Voltage)
-  }
-
-  // console.log(updatedNodes.get(lineId.split('_')[2]))
-  console.log(valMap.get(lineId))
-  console.log(current)
-  return Math.round(current * 100 ) / 100
+  return 0
 
  }
 
@@ -319,6 +305,7 @@ const CircuitCanvas = () => {
         </Select>
         <input type="text" id="frequency" name="frequency" placeholder="Frequency" value={frequency} onChange={(e)=>setFrequency(e.target.value)}/>
           <Button onClick={sendSimulationData}>Run Simulation</Button>
+          <Button onClick={viewSimulation}>View simulation</Button>
           <Button onClick={() => valMap.forEach((value, key) => {
     console.log(`${key} => ${value}`) ;
   })}>Lock Circuit</Button>

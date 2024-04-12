@@ -1,83 +1,86 @@
 from matplotlib import pyplot as plt
-from matplotlib.pyplot import figure, show, xlabel, ylabel, legend
+from matplotlib.pyplot import figure, show, xlabel, ylabel, legend, subplots, savefig
 from lcapy import *
 from sympy import *
 import cmath
 from cmath import polar
 import numpy as np
 
-def evaluate_complex_expression(expression):
-    # Define a safe list of functions and constants
-    safe_dict = {
-        'sqrt': cmath.sqrt,
-        'exp': cmath.exp,
-        'atan': cmath.atan,
-        'pi': cmath.pi,
-        'j': 1j,  # Imaginary unit
+def run_ac_analysis(netlist_filename='netlist.txt'):
+    # Read the netlist string from the file
+    with open(netlist_filename, 'r') as file:
+        netlist_string = file.read()
+
+    # Define the circuit with the read netlist
+    cct = Circuit(netlist_string)
+
+    # Perform AC analysis
+    cct_ac = cct.ac()
+
+    # Helper function to evaluate complex expressions
+    def evaluate_complex_expression(expression):
+        safe_dict = {
+            'sqrt': cmath.sqrt,
+            'exp': cmath.exp,
+            'atan': cmath.atan,
+            'pi': cmath.pi,
+            'j': 1j,  # Imaginary unit
+        }
+        try:
+            result = -1j * eval(expression, {"__builtins__": None}, safe_dict)
+        except Exception as e:
+            print(f"Error evaluating expression: {e}")
+            return None  # or raise an exception, or handle it as you see fit
+        return complex(result)
+
+    # Lists for storing phasor data and component labels
+    v_phasors = []
+    labels = []
+    colors = []  # We can use a cycle of colors or define a large list manually
+    color_cycle = plt.cm.viridis(np.linspace(0, 1, 20))  # More colors than expected components
+
+    # Helper function to extract and store phasors
+    def add_phasors(component, label_prefix):
+        if component in cct_ac.elements:
+            v_phasor_expr = str(cct_ac[component].v.phasor())
+            v_phasor = evaluate_complex_expression(v_phasor_expr)
+            magnitude, angle = polar(v_phasor)
+            v_phasors.append((magnitude, angle))
+            labels.append(f'V_{component}')
+            colors.append(component_color[label_prefix])
+
+    # Component type to color mapping
+    component_color = {
+        'R': 'red',    # Resistors are red
+        'L': 'yellow', # Inductors are yellow
+        'C': 'blue'    # Capacitors are blue
     }
 
-    # Evaluate the expression safely
-    try:
-        result = -j*eval(expression, {"__builtins__": None}, safe_dict)
-    except Exception as e:
-        # Handle error (here we just print it, but you might want to handle it differently)
-        print(f"Error evaluating expression: {e}")
-        return None  # or raise an exception, or handle it as you see fit
+    # Automatically detect components based on common naming conventions
+    for component_type_prefix in ['R', 'L', 'C']:  # Resistors, Inductors, Capacitors
+        index = 1
+        while True:
+            component_name = f"{component_type_prefix}{index}"
+            if component_name not in cct_ac.elements:
+                break
+            add_phasors(component_name, component_type_prefix)
+            index += 1
 
-    # Ensure the result is treated as a complex number
-    return complex(result)
+    # Plotting on polar projection
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    for (magnitude, angle), label, color in zip(v_phasors, labels, colors):
+        ax.plot([0, angle], [0, magnitude], label=label, color=color)
+        annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
+        print(annotation)
+        ax.annotate(annotation, xy=(angle, magnitude), xytext=(angle + 0.1, magnitude + 0.1),
+                    textcoords='data', arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color=color),
+                    bbox=dict(boxstyle="round,pad=0.3", facecolor='white', edgecolor=color, alpha=0.5), color=color)
 
-# Read the netlist string from the file
-netlist_filename = 'netlist.txt'
-with open(netlist_filename, 'r') as file:
-    netlist_string = file.read()
+    # Enhance the plot
+    ax.set_thetagrids(range(0, 360, 45))
+    ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
 
-# Define the circuit with the read netlist
-cct = Circuit(netlist_string)
+    plt.savefig('ac_analysis_phasor.png')
 
-# Perform AC analysis by substituting source voltage and converting to frequency domain
-cct_ac = cct.ac()
-
-# Correctly calling the phasor method to obtain the phasors for voltages across components
-VR_phasor = cct_ac.R1.v.phasor()
-VL_phasor = cct_ac.L1.v.phasor()
-VC_phasor = cct_ac.C1.v.phasor()
-
-e1=str(VR_phasor)
-e2=str(VC_phasor)
-e3=str(VL_phasor)
-
-# Evaluate the expression
-VR = evaluate_complex_expression(e1)
-VC = evaluate_complex_expression(e2)
-VL = evaluate_complex_expression(e3)
-
-# Output the result
-print(f"Vr: {VR}")
-print(f"Vl: {VL}")
-print(f"Vc: {VC}")
-
-# List of the complex numbers for iteration
-phasors = [VR, VC, VL]
-labels = ['V_R', 'V_C', 'V_L']
-colors = ['red', 'green', 'blue']  # Different color for each phasor
-
-# Plotting on polar projection
-fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-
-# Iterate over each phasor to plot
-for phasor, label, color in zip(phasors, labels, colors):
-    magnitude, angle = polar(phasor)
-    ax.plot([0, angle], [0, magnitude], color=color, label=label)
-    mag = magnitude
-    angle_deg = np.degrees(angle)  # Convert angle to degrees
-    annotation = f'{label}: {mag:.2f}∠{angle_deg:.0f}°'
-    ax.annotate(annotation, xy=(angle, magnitude), xytext=(angle + 0.2, magnitude + magnitude*0.2),
-                textcoords='data', arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color=color),
-                bbox=dict(boxstyle="round,pad=0.3", facecolor='white', edgecolor=color, alpha=0.5), color=color)
-
-# Enhance the plot
-ax.set_thetagrids(range(0, 360, 90), labels=['0°', '90°', '180°', '270°'])
-ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
-
-plt.show()
+# To run the analysis, call the function with an appropriate netlist file
+# run_ac_analysis('netlist.txt')

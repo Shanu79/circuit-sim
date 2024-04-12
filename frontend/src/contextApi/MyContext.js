@@ -9,17 +9,14 @@ export const ContextProvider = ({ children }) => {
   const [lines, setLines] = useState([]); // State variable to track lines
   const [selectedLine, setSelectedLine] = useState();
   const [selectedComponent, setSelectedComponent] = useState('W')
-  const [valMap, setValMap] = useState(new Map())
-  
+  const [valMap, setValMap] = useState(new Map());
+  const [imageSrc, setImageSrc] = useState('');
 
   const [selectedNodes, setSelectedNodes] = useState(new Map()); // to select nodes that are part of the schematics
 
   // console.log(selectedNodes)
 
   const [updatedNodes, setUpdatedNodes] = useState(new Map())
- 
-
-  const [runSim, setRunSim] = useState(false);
 
   const [simData, setSimData] = useState("");
 
@@ -117,6 +114,12 @@ fetch('http://localhost:5000/', {
   .catch(error => console.error('Error: ', error));
 }
 
+const viewSimulation = () => {
+  const imageUrl = "http://localhost:5000/get-image";
+  // Open a new tab or window displaying the image
+  window.open(imageUrl, '_blank');
+}
+
   const [circuit, setCircuit] = useState([
     {
       id: 0,
@@ -129,9 +132,6 @@ fetch('http://localhost:5000/', {
     }
   ])
 
-  useEffect(()=>{
-
-  }, [runSim])
 
   return (
     <MyContext.Provider
@@ -148,11 +148,10 @@ fetch('http://localhost:5000/', {
         setCircuit,
         selectedNodes, 
         setSelectedNodes,
-        runSim, 
-        setRunSim,
         updatedNodes, 
         setUpdatedNodes,
         sendSimulationData, // Updated to use the new function name
+        viewSimulation,
         analysisType,
         setAnalysisType, // Allowing components to update the analysis type
         frequency,
