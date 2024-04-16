@@ -62,7 +62,7 @@ def simulate():
             app.config['IMG_FILE_NAME'] = "ac_analysis_phasor.png"
             node_voltages = {}
         elif analysisType == "transient":
-            # Placeholder for Transient Analysis
+            run_transient_analysis()
             app.config['IMG_FILE_NAME'] = "transient_analysis-voltage.png"
             node_voltages = {}
         else:

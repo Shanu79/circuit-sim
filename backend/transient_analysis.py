@@ -3,10 +3,10 @@ matplotlib.use('Agg')  # Set the backend before importing pyplot
 
 from lcapy import Circuit
 import numpy as np
-from matplotlib.pyplot import subplots, savefig
+from matplotlib.pyplot import subplots, savefig, tight_layout
 
 def run_transient_analysis(netlist_filename='netlist.txt'):
-    t = np.linspace(0, 0.05, 1000)
+    t = np.linspace(0, 0.05, 1000)  # Time range for the analysis
 
     # Read the netlist string from the file
     with open(netlist_filename, 'r') as file:
@@ -14,43 +14,57 @@ def run_transient_analysis(netlist_filename='netlist.txt'):
 
     # Define the circuit with the read netlist
     cct = Circuit(netlist_string)
+  
+    fig, ax=subplots(1)
 
-    # Calculate the transient responses
-    Vr = cct.R1.V
-    Vl = cct.L1.V  # Voltage across the inductor
-    Vc = cct.C1.V  # Voltage across the capacitor
+    # Handle arbitrary numbers of resistors, capacitors, and inductors
+    for component_type in ['R', 'L', 'C']:
+        index = 1
+        while True:
+            component_name = f"{component_type}{index}"
+            if component_name not in cct.elements:
+                break
 
-    vr = Vr.transient_response(t)
-    vl = Vl.transient_response(t)
-    vc = Vc.transient_response(t)
+            # Transient response of voltage
+            V = getattr(cct, component_name).V
+            v_response = V.transient_response(t)
+            # print(v_response)
+            linestyle = '--' if component_type == 'L' else ':' if component_type == 'C' else '-'
+            ax.plot(t, v_response, label=f'V{component_name} ({component_type})', linewidth=2, linestyle=linestyle)
 
-    Ir = cct.R1.I
-    Il = cct.L1.I
-    Ic = cct.C1.I
-
-    ir = Ir.transient_response(t)
-    il = Il.transient_response(t)
-    ic = Ic.transient_response(t)
-
-    # Plotting
-    fig, ax = subplots(1)
-    ax.plot(t, vr, label='VR (Resistor)', linewidth=2)
-    ax.plot(t, vl, label='VL (Inductor)', linewidth=2, linestyle='--')
-    ax.plot(t, vc, label='VC (Capacitor)', linewidth=2, linestyle=':')
+            index += 1
+    # Plot settings for Voltage
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Voltage (V)')
     ax.grid(True)
     ax.legend()
-
+    tight_layout()
     savefig('transient_analysis-voltage.png')
+    
+    # Clear the voltage plot before plotting currents
+    ax.cla()
 
-    fig, ax = subplots(1)
-    ax.plot(t, ir, label='IR (Resistor)', linewidth=2)
-    ax.plot(t, il, label='IL (Inductor)', linewidth=2, linestyle='--')
-    ax.plot(t, ic, label='IC (Capacitor)', linewidth=2, linestyle=':')
+    # Handle arbitrary numbers of resistors, capacitors, and inductors
+    for component_type in ['R', 'L', 'C']:
+        index = 1
+        while True:
+            component_name = f"{component_type}{index}"
+            if component_name not in cct.elements:
+                break
+            
+            # Transient response of current
+            I = getattr(cct, component_name).I
+            i_response = I.transient_response(t)
+            # print(i_response)
+            linestyle = '--' if component_type == 'L' else ':' if component_type == 'C' else '-'
+            ax.plot(t, i_response, label=f'I{component_name} ({component_type})', linewidth=2, linestyle=linestyle)
+
+            index += 1
+
+    # Plot settings for Current
     ax.set_xlabel('Time (s)')
     ax.set_ylabel('Current (A)')
     ax.grid(True)
     ax.legend()
-
+    tight_layout()
     savefig('transient_analysis-current.png')

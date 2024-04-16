@@ -117,7 +117,8 @@ fetch('http://localhost:5000/', {
 const viewSimulation = () => {
   const imageUrl = "http://localhost:5000/get-image";
   // Open a new tab or window displaying the image
-  window.open(imageUrl, '_blank');
+  let params='width=700,height=500'
+  window.open(imageUrl, '_blank', params);
 }
 
   const [circuit, setCircuit] = useState([
