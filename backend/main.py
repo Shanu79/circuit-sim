@@ -42,8 +42,10 @@ def simulate():
             node2 = comp.get('node2', '')
             value = comp.get('value', '')
 
-            if type_prefix in ['AC Source', 'Inductor', 'Resistor', 'Wire', 'Capacitor', 'Generic']:
-                line = f"{id_} {node1} {node2} {value}\n"
+            if type_prefix in ['AC Source','DC Source', 'Inductor', 'Resistor', 'Wire', 'Capacitor', 'Generic']:
+                if type_prefix=='AC Source' or type_prefix=='DC Source':
+                    line=f"{id_} {node2} {node1} {value}\n"
+                else: line = f"{id_} {node1} {node2} {value}\n"
                 cctt += line
 
         # Dummy Circuit processing. Implement your Circuit class logic here
@@ -61,14 +63,19 @@ def simulate():
             run_ac_analysis()
             app.config['IMG_FILE_NAME'] = "ac_analysis_phasor.png"
             node_voltages = {}
+            current={}
         elif analysisType == "transient":
             run_transient_analysis()
             app.config['IMG_FILE_NAME'] = "transient_analysis-voltage.png"
-            node_voltages = {}
+            # node_voltages = {}
+            # current={}
         else:
             raise ValueError("Unsupported analysis type")
 
-        return jsonify({"node_voltages": node_voltages})
+        return jsonify({
+            "node_voltages": node_voltages,
+            "current": current
+                        })
 
     except Exception as e:
         app.logger.error("Error during simulation: %s", str(e))

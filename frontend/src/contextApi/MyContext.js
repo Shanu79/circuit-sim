@@ -73,7 +73,12 @@ const sendSimulationData = () => {
     } else if(type==="W"){
       component.type="Wire";
       component.id=`W${components.filter(comp=>comp.type==='Wire').length+1}`;
-    } else {
+    } else if(type==="V"){
+      component.type="DC Source";
+      component.id=`V${components.filter(comp=>comp.type==='DC Source').length+1}`;
+      component.value=`${value}`
+    }
+    else {
       // Generic component or handle other specific cases
       component.type = 'Generic';
       component.id = key;

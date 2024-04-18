@@ -27,58 +27,64 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
             'j': 1j,  # Imaginary unit
         }
         try:
-            result = -1j * eval(expression, {"__builtins__": None}, safe_dict)
+            result = j * eval(expression, {"__builtins__": None}, safe_dict)
         except Exception as e:
             print(f"Error evaluating expression: {e}")
             return None  # or raise an exception, or handle it as you see fit
         return complex(result)
-
+    
     # Lists for storing phasor data and component labels
-    v_phasors = []
+    phasors = []
     labels = []
-    colors = []  # We can use a cycle of colors or define a large list manually
-    color_cycle = plt.cm.viridis(np.linspace(0, 1, 20))  # More colors than expected components
 
     # Helper function to extract and store phasors
-    def add_phasors(component, label_prefix):
-        if component in cct_ac.elements:
-            v_phasor_expr = str(cct_ac[component].v.phasor())
-            v_phasor = evaluate_complex_expression(v_phasor_expr)
+    def add_phasors(component):
+        # Voltage phasor
+        v_phasor_expr = str(cct_ac[component].v.phasor())
+        v_phasor = evaluate_complex_expression(v_phasor_expr)
+        if v_phasor is not None:
             magnitude, angle = polar(v_phasor)
-            v_phasors.append((magnitude, angle))
+            phasors.append((magnitude, angle))
             labels.append(f'V_{component}')
-            colors.append(component_color[label_prefix])
-
-    # Component type to color mapping
-    component_color = {
-        'R': 'red',    # Resistors are red
-        'L': 'yellow', # Inductors are yellow
-        'C': 'blue'    # Capacitors are blue
-    }
+        
+        # Current phasor
+        i_phasor_expr = str(cct_ac[component].i.phasor())
+        i_phasor = evaluate_complex_expression(i_phasor_expr)
+        if i_phasor is not None:
+            magnitude, angle = polar(i_phasor)
+            phasors.append((magnitude, angle))
+            labels.append(f'I_{component}')
 
     # Automatically detect components based on common naming conventions
-    for component_type_prefix in ['R', 'L', 'C']:  # Resistors, Inductors, Capacitors
+    component_count=0
+    for component_type_prefix in ['A','V','R', 'L', 'C']: 
+        component_count+=1
         index = 1
         while True:
             component_name = f"{component_type_prefix}{index}"
             if component_name not in cct_ac.elements:
                 break
-            add_phasors(component_name, component_type_prefix)
+            add_phasors(component_name)
             index += 1
 
     # Plotting on polar projection
-    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
-    for (magnitude, angle), label, color in zip(v_phasors, labels, colors):
-        ax.plot([0, angle], [0, magnitude], label=label, color=color)
+    fig=plt.figure()
+    ax = fig.add_subplot(111, polar=True)
+
+    print(phasors)
+   
+    #ax.arrow(0,0,LV.theta[1],LV.mag[1], length_includes_head=True)
+    for (magnitude, angle), label in zip(phasors, labels):
+        # Optional: Print phasor data to the console for debugging or overview
         annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
         print(annotation)
-        ax.annotate(annotation, xy=(angle, magnitude), xytext=(angle + 0.1, magnitude + 0.1),
-                    textcoords='data', arrowprops=dict(arrowstyle="->", connectionstyle="arc3", color=color),
-                    bbox=dict(boxstyle="round,pad=0.3", facecolor='white', edgecolor=color, alpha=0.5), color=color)
+        
+        # Plot a visible line for legend purposes (make it very short and outside the normal view)
+        ax.plot([0, angle], [0, magnitude], label=annotation)
 
     # Enhance the plot
-    ax.set_thetagrids(range(0, 360, 45))
-    ax.legend(loc='upper right', bbox_to_anchor=(1.1, 1.1))
+    ax.set_yticklabels([])
+    ax.legend(bbox_to_anchor=(0,0,1,1), bbox_transform=fig.transFigure)
 
     plt.savefig('ac_analysis_phasor.png')
 
