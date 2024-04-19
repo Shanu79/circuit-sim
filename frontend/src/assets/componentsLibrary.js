@@ -99,21 +99,23 @@ export const components = {
     ACSource: {
         id: 6,
         name: 'ACSource',
-        component: (svg, lineId, setSelectedLine,handleLineDoubleClick,showLineCurrent, hideLineCurrent, x1, x2, y1, y2) => (
+        component: (svg, lineId, setSelectedLine, handleLineDoubleClick, showLineCurrent, hideLineCurrent, x1, x2, y1, y2) => {
             svg.append("path")
             .attr("id", lineId)
-            .attr("d", "M -50,25.000005 L 0,25.000005 C 0,25.000005 1.5,20.000004 4.5,20.000004 C 7.5,20.000004 10.5,30.000006 13.5,30.000006 C 16.5,30.000006 18,25.000005 18,25.000005 L 60,25.000005")
+            .attr("d", "M -50,25.000005 L 0,25.000005 C 0,25.000005 1.5,20.000004 4.5,20.000004 C 7.5,20.000004 10.5,30.000006 13.5,30.000006 C 16.5,30.000006 18,25.000005 18,25.000005 L 25,25.000005 " +
+            "A 15,15 0 1,0 -5,25.000005 " + // First arc creating the right half of the circle
+            "A 15,15 0 1,0 25,25.000005 " + // Second arc creating the left half and returning to start point of circle
+            "L 60,25.000005")
             .attr("stroke", "black")
             .attr("stroke-width", "3")
             .attr("stroke-linejoin", "bevel")
             .attr("fill", "none")
-             
             .attr("transform", " rotate("+(x1===x2?Math.sign(y2-y1):(x2>x1?0:-2))*90+" "+x1+" "+y1+") "+`translate(${x1+50},${y1-25})`)
             .on("click", () => setSelectedLine(lineId))
+            .on("mouseover", (e)=> showLineCurrent(e, lineId))
             .on("dblclick", () => handleLineDoubleClick(lineId, 0))
-            
-        )
-    }
+        }
+    } 
 
 }
 

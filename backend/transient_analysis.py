@@ -39,7 +39,7 @@ def run_transient_analysis(netlist_filename='netlist.txt'):
     ax.grid(True)
     ax.legend()
     tight_layout()
-    savefig('transient_analysis-voltage.png')
+    savefig('static/transient_analysis-voltage.png')
     
     # Clear the voltage plot before plotting currents
     ax.cla()
@@ -67,4 +67,4 @@ def run_transient_analysis(netlist_filename='netlist.txt'):
     ax.grid(True)
     ax.legend()
     tight_layout()
-    savefig('transient_analysis-current.png')
+    savefig('static/transient_analysis-current.png')

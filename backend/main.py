@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, url_for
 import json  # Import the json module
 import numpy as np  # For numerical operations
 from flask_cors import CORS
@@ -56,38 +56,56 @@ def simulate():
         with open(netlist_filename, 'w') as file:
             file.write(cctt)
 
+        image_files = {
+            'ac': [
+                ("ac_analysis_voltage_phasor.png", "Voltage Phasor"),
+                ("ac_analysis_current_phasor.png", "Current Phasor")
+            ],
+            'transient': [
+                ("transient_analysis-voltage.png", "Transient Voltage"),
+                ("transient_analysis-current.png", "Transient Current")
+            ]
+        }.get(analysisType, [])
+
         if analysisType == "dc":
             # Placeholder for DC Analysis
             node_voltages = {f"Node {i}": "0 V" for i in range(1, numberOfNodes+1)}
+            current = {}
         elif analysisType == "ac":
             run_ac_analysis()
-            app.config['IMG_FILE_NAME'] = "ac_analysis_phasor.png"
             node_voltages = {}
-            current={}
+            current = {}
+            app.config['IMAGES'] = image_files
         elif analysisType == "transient":
             run_transient_analysis()
-            app.config['IMG_FILE_NAME'] = "transient_analysis-voltage.png"
-            # node_voltages = {}
-            # current={}
+            node_voltages = {}
+            current = {}
+            app.config['IMAGES'] = image_files
         else:
             raise ValueError("Unsupported analysis type")
 
         return jsonify({
             "node_voltages": node_voltages,
             "current": current
-                        })
+        })
 
     except Exception as e:
         app.logger.error("Error during simulation: %s", str(e))
         return jsonify({"error": str(e)}), 500
 
-@app.route('/get-image', methods=['GET'])
-def get_image():
-    img_file_name = app.config.get('IMG_FILE_NAME', "")
-    if img_file_name:
-        return send_file(img_file_name, mimetype='image/png')
+@app.route('/get-images/<analysis_type>', methods=['GET'])
+def get_images(analysis_type):
+    image_files = app.config.get('IMAGES', [])
+
+    if image_files:
+        response = []
+        for filename, description in image_files:
+            image_url = url_for('static', filename=filename)
+            print("Generated URL:", image_url) 
+            response.append({'url': image_url, 'description': description})
+        return jsonify(response)
     else:
-        return jsonify({"error": "Image file not found"}), 404
+        return jsonify({"error": "No image files found for the given analysis type"}), 404
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)

@@ -38,6 +38,7 @@ export const ContextProvider = ({ children }) => {
     return handleUpdateNodes();
   }, [selectedNodes])
 
+let sourceCnt=0;
 const sendSimulationData = () => {
   const components = [];
 
@@ -55,8 +56,9 @@ const sendSimulationData = () => {
     };
 
     if (type === "A") {
+      sourceCnt+=1
       component.type = 'AC Source';
-      component.id = `V${components.filter(comp => comp.type === 'AC Source').length + 1}`;
+      component.id = `V${sourceCnt}`;
       component.value = `{${value}*sin(2*pi*${frequency}*t)}`;
     } else if (type === "L") {
       component.type = 'Inductor';
@@ -74,8 +76,9 @@ const sendSimulationData = () => {
       component.type="Wire";
       component.id=`W${components.filter(comp=>comp.type==='Wire').length+1}`;
     } else if(type==="V"){
+      sourceCnt+=1
       component.type="DC Source";
-      component.id=`V${components.filter(comp=>comp.type==='DC Source').length+1}`;
+      component.id=`V${sourceCnt}`;
       component.value=`${value}`
     }
     else {
@@ -119,11 +122,26 @@ fetch('http://localhost:5000/', {
   .catch(error => console.error('Error: ', error));
 }
 
-const viewSimulation = () => {
-  const imageUrl = "http://localhost:5000/get-image";
-  // Open a new tab or window displaying the image
-  let params='width=700,height=500'
-  window.open(imageUrl, '_blank', params);
+const viewSimulation = (analysisType) => {
+  const apiUrl = `http://localhost:5000/get-images/${analysisType}`;
+  
+  fetch(apiUrl)
+    .then(response => response.json())
+    .then(data => {
+      if (data.error) {
+        console.error('Failed to load images:', data.error);
+      } else {
+        const popup = window.open('', '_blank', 'width=800,height=600');
+        popup.document.write('<html><head><title>Simulation Results</title></head><body>');
+        data.forEach(item => {
+          popup.document.write(`<h2>${item.description}</h2>`);
+          popup.document.write(`<img src="http://localhost:5000${item.url}" alt="${item.description}" style="width:100%">`);
+        });
+        popup.document.write('</body></html>');
+        popup.document.close();
+      }
+    })
+    .catch(error => console.error('Error fetching images:', error));
 }
 
   const [circuit, setCircuit] = useState([

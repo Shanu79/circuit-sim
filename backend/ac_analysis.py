@@ -27,15 +27,18 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
             'j': 1j,  # Imaginary unit
         }
         try:
-            result = j * eval(expression, {"__builtins__": None}, safe_dict)
+            result = j*eval(expression, {"__builtins__": None}, safe_dict)
         except Exception as e:
             print(f"Error evaluating expression: {e}")
             return None  # or raise an exception, or handle it as you see fit
         return complex(result)
     
     # Lists for storing phasor data and component labels
-    phasors = []
-    labels = []
+    v_phasors = []
+    v_labels = []
+
+    i_phasors=[]
+    i_labels=[]
 
     # Helper function to extract and store phasors
     def add_phasors(component):
@@ -44,20 +47,20 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
         v_phasor = evaluate_complex_expression(v_phasor_expr)
         if v_phasor is not None:
             magnitude, angle = polar(v_phasor)
-            phasors.append((magnitude, angle))
-            labels.append(f'V_{component}')
+            v_phasors.append((magnitude, angle))
+            v_labels.append(f'V_{component}')
         
         # Current phasor
         i_phasor_expr = str(cct_ac[component].i.phasor())
         i_phasor = evaluate_complex_expression(i_phasor_expr)
         if i_phasor is not None:
             magnitude, angle = polar(i_phasor)
-            phasors.append((magnitude, angle))
-            labels.append(f'I_{component}')
+            i_phasors.append((magnitude, angle))
+            i_labels.append(f'I_{component}')
 
     # Automatically detect components based on common naming conventions
     component_count=0
-    for component_type_prefix in ['A','V','R', 'L', 'C']: 
+    for component_type_prefix in ['A', 'V', 'R', 'L', 'C']: 
         component_count+=1
         index = 1
         while True:
@@ -70,11 +73,9 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
     # Plotting on polar projection
     fig=plt.figure()
     ax = fig.add_subplot(111, polar=True)
-
-    print(phasors)
    
     #ax.arrow(0,0,LV.theta[1],LV.mag[1], length_includes_head=True)
-    for (magnitude, angle), label in zip(phasors, labels):
+    for (magnitude, angle), label in zip(v_phasors, v_labels):
         # Optional: Print phasor data to the console for debugging or overview
         annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
         print(annotation)
@@ -85,8 +86,24 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
     # Enhance the plot
     ax.set_yticklabels([])
     ax.legend(bbox_to_anchor=(0,0,1,1), bbox_transform=fig.transFigure)
+    plt.savefig('static/ac_analysis_voltage_phasor.png')
 
-    plt.savefig('ac_analysis_phasor.png')
 
-# To run the analysis, call the function with an appropriate netlist file
-# run_ac_analysis('netlist.txt')
+    # Plotting on polar projection
+    fig=plt.figure()
+    ay = fig.add_subplot(111, polar=True)
+   
+    #ax.arrow(0,0,LV.theta[1],LV.mag[1], length_includes_head=True)
+    for (magnitude, angle), label in zip(i_phasors, i_labels):
+        # Optional: Print phasor data to the console for debugging or overview
+        annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
+        print(annotation)
+        
+        # Plot a visible line for legend purposes (make it very short and outside the normal view)
+        ay.plot([0, angle], [0, magnitude], label=annotation)
+
+    # Enhance the plot
+    ay.set_yticklabels([])
+    ay.legend(bbox_to_anchor=(0,0,1,1), bbox_transform=fig.transFigure)
+
+    plt.savefig('static/ac_analysis_current_phasor.png')

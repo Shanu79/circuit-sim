@@ -102,3 +102,8 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+ac_analysis_current_phasor.png
+ac_analysis_voltage_phasor.png
+
+transient_analysis-current.png
+transient_analysis-voltage.png
