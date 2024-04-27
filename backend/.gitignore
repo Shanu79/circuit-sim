@@ -1,5 +1,5 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -101,7 +101,6 @@ venv.bak/
 /site
 
 # mypy
-.mypy_cache/
 ac_analysis_current_phasor.png
 ac_analysis_voltage_phasor.png
 
