@@ -72,9 +72,7 @@ def simulate():
             node_voltages = {f"Node {i}": "0 V" for i in range(1, numberOfNodes+1)}
             current = {}
         elif analysisType == "ac":
-            run_ac_analysis()
-            node_voltages = {}
-            current = {}
+            node_voltages, current = run_ac_analysis()
             app.config['IMAGES'] = image_files
         elif analysisType == "transient":
             run_transient_analysis()
@@ -85,7 +83,7 @@ def simulate():
             raise ValueError("Unsupported analysis type")
 
         return jsonify({
-            "node_voltages": node_voltages,
+            "voltages": node_voltages,
             "current": current
         })
 

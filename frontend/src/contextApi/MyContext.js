@@ -38,8 +38,10 @@ export const ContextProvider = ({ children }) => {
     return handleUpdateNodes();
   }, [selectedNodes])
 
-let sourceCnt=0;
-const sendSimulationData = () => {
+console.log(valMap)
+let sourceCnt = 0;
+let temp = {};
+
   const components = [];
 
   valMap.forEach((value, key) => {
@@ -55,41 +57,54 @@ const sendSimulationData = () => {
       value: ''
     };
 
-    if (type === "A") {
-      sourceCnt+=1
-      component.type = 'AC Source';
-      component.id = `V${sourceCnt}`;
-      component.value = `{${value}*sin(2*pi*${frequency}*t)}`;
-    } else if (type === "L") {
-      component.type = 'Inductor';
-      component.id = `L${components.filter(comp => comp.type === 'Inductor').length + 1}`;
-      component.value = `${value}`;
-    } else if (type === "C") {
-      component.type = 'Capacitor';
-      component.id = `C${components.filter(comp => comp.type === 'Capacitor').length + 1}`;
-      component.value = `${value}`;
-    } else if (type === "R") {
-      component.type = 'Resistor';
-      component.id = `R${components.filter(comp => comp.type === 'Resistor').length + 1}`;
-      component.value = `${value}`;
-    } else if(type==="W"){
-      component.type="Wire";
-      component.id=`W${components.filter(comp=>comp.type==='Wire').length+1}`;
-    } else if(type==="V"){
-      sourceCnt+=1
-      component.type="DC Source";
-      component.id=`V${sourceCnt}`;
-      component.value=`${value}`
+    switch (type) {
+      case "A":
+        sourceCnt++;
+        component.type = 'AC Source';
+        component.id = `V${sourceCnt}`;
+        component.value = `{${value}*sin(2*pi*${frequency}*t)}`;
+        temp[key] = `V${sourceCnt}`;
+        break;
+      case "L":
+        component.type = 'Inductor';
+        component.id = `L${components.filter(comp => comp.type === 'Inductor').length + 1}`;
+        component.value = `${value}`;
+        temp[key] = `L${components.filter(comp => comp.type === 'Inductor').length + 1}`;
+        break;
+      case "C":
+        component.type = 'Capacitor';
+        component.id = `C${components.filter(comp => comp.type === 'Capacitor').length + 1}`;
+        component.value = `${value}`;
+        temp[key] = `C${components.filter(comp => comp.type === 'Capacitor').length + 1}`;
+        break;
+      case "R":
+        component.type = 'Resistor';
+        component.id = `R${components.filter(comp => comp.type === 'Resistor').length + 1}`;
+        component.value = `${value}`;
+        temp[key] = `R${components.filter(comp => comp.type === 'Resistor').length + 1}`;
+        break;
+      case "W":
+        component.type = 'Wire';
+        component.id = `W${components.filter(comp => comp.type === 'Wire').length + 1}`;
+        temp[key] = `W${components.filter(comp => comp.type === 'Wire').length + 1}`;
+        break;
+      case "V":
+        sourceCnt++;
+        component.type = 'DC Source';
+        component.id = `V${sourceCnt}`;
+        component.value = `${value}`;
+        temp[key] = `V${sourceCnt}`;
+        break;
+      default:
+        component.type = 'Generic';
+        component.id = key;
+        component.value = value.toString(); // Ensure the value is a string
     }
-    else {
-      // Generic component or handle other specific cases
-      component.type = 'Generic';
-      component.id = key;
-      component.value = value.toString(); // Ensure the value is a string
-    }
+
     components.push(component);
   });
-
+  
+  const sendSimulationData = () => {
   // Convert the components array into a JSON string
   // Now including the nodes and value in a specific format for each component
   const netstring = JSON.stringify({components: components}, null, 2); // Pretty print JSON
@@ -97,8 +112,8 @@ const sendSimulationData = () => {
   // Send the JSON string to your backend
 
 
-  console.log(netstring);
-  console.log(updatedNodes);
+  // console.log(netstring);
+  // console.log(updatedNodes);
 
   const body = { 
     netList: netstring, 
@@ -182,8 +197,8 @@ const viewSimulation = (analysisType) => {
         setFrequency,
         simData,
         valMap,
-        setValMap
-        
+        setValMap,
+        temp
       }}
     >
       {children}
@@ -193,6 +208,5 @@ const viewSimulation = (analysisType) => {
 
 export const useMyContext = ()=>{
     return useContext(MyContext);
-    
 }
 

@@ -73,14 +73,16 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
     # Plotting on polar projection
     fig=plt.figure()
     ax = fig.add_subplot(111, polar=True)
-   
+    
+    res_voltages={};
+    res_current={};
     #ax.arrow(0,0,LV.theta[1],LV.mag[1], length_includes_head=True)
     for (magnitude, angle), label in zip(v_phasors, v_labels):
         # Optional: Print phasor data to the console for debugging or overview
         annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
         print(annotation)
+        res_voltages[label] = f'{magnitude:.2f}∠{np.degrees(angle):.0f}°'
         
-        # Plot a visible line for legend purposes (make it very short and outside the normal view)
         ax.plot([0, angle], [0, magnitude], label=annotation)
 
     # Enhance the plot
@@ -98,6 +100,7 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
         # Optional: Print phasor data to the console for debugging or overview
         annotation = f'{label}: {magnitude:.2f}∠{np.degrees(angle):.0f}°'
         print(annotation)
+        res_current[label]=f'{magnitude:.2f}∠{np.degrees(angle):.0f}°'
         
         # Plot a visible line for legend purposes (make it very short and outside the normal view)
         ay.plot([0, angle], [0, magnitude], label=annotation)
@@ -107,3 +110,5 @@ def run_ac_analysis(netlist_filename='netlist.txt'):
     ay.legend(bbox_to_anchor=(0,0,1,1), bbox_transform=fig.transFigure)
 
     plt.savefig('static/ac_analysis_current_phasor.png')
+
+    return res_voltages, res_current

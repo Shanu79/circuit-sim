@@ -62,7 +62,8 @@ const CircuitCanvas = () => {
     setFrequency,
     simData,
     valMap,
-    setValMap
+    setValMap,
+    temp
   } = useMyContext();
 
   const [NodeVoltagePosition, setNodeVoltagePosition] = useState({ x: 0, y: 0 });
@@ -380,11 +381,9 @@ const CircuitCanvas = () => {
               boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
             }}
           >
-            {(simData["node_voltages"] && simData["node_voltages"][`Node ${updatedNodes.has(NodeVoltageDotId) ? updatedNodes.get(NodeVoltageDotId) : 'not in circuit'}`]) || 'NODE' }
+            {(simData["voltages"] && simData["voltages"][`Node ${updatedNodes.has(NodeVoltageDotId) ? updatedNodes.get(NodeVoltageDotId) : 'not in circuit'}`]) || 'NODE' }
           </div>
           )}
-
-          {isLineCurrentVisible && (
             <div
              style={{
               position: "absolute",
@@ -396,13 +395,19 @@ const CircuitCanvas = () => {
               boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
              }}
             >
-             {LineCurrentId.slice(0,1)}: { (valMap.get(LineCurrentId) || "no value") + " "}
-
-             {LineCurrentId.slice(0,1) === 'V' ? '' : `current: ${simData["node_voltages"] ? getCurrent(LineCurrentId) + 'A' : ''}` }
-
-             
-            </div>
-          )}
+            <span>{temp[LineCurrentId.slice(0)]}: {valMap.get(LineCurrentId) || "no value"} V</span>
+            <br></br>
+            { // Check if simData is available before attempting to access its properties
+              simData && (
+                <>
+                  <span> V: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]} V</span>
+                  <br></br>
+                  <span> I: {simData["current"][`I_${temp[LineCurrentId.slice(0)]}`]} A</span>
+                </>
+              )
+            }
+          </div>
+          )
         </div>
       </CircuitBoard >
 
