@@ -122,7 +122,7 @@ let temp = {};
     frequency: frequency
   };
 
-fetch('https://circuit-sim.onrender.com/', {
+fetch('http://localhost:5000/', {
   method: 'POST', // or 'GET' or any other HTTP method you need
   headers: {
     'Content-Type': 'application/json',

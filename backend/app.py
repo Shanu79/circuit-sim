@@ -106,4 +106,4 @@ def get_images(analysis_type):
         return jsonify({"error": "No image files found for the given analysis type"}), 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=8000, debug=True)
+    app.run(host="0.0.0.0",port=5000, debug=True)
