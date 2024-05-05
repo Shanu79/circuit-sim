@@ -7,9 +7,17 @@ import sympy as sp  # For more control over symbolic expressions
 import re
 from transient_analysis import run_transient_analysis
 from ac_analysis import run_ac_analysis
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
+
+# Set the default port to 8000 if not specified in the environment
+port = int(os.environ.get('PORT', 8000))
 
 # Use Flask's application context to store the image file name instead of a global variable
 app.config['IMG_FILE_NAME'] = ""
@@ -106,4 +114,4 @@ def get_images(analysis_type):
         return jsonify({"error": "No image files found for the given analysis type"}), 404
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",port=5000, debug=True)
+    app.run(host="0.0.0.0",port=port)

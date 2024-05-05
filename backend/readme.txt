@@ -1,3 +1,3 @@
 set FLASK_APP=app.py
 $env:FLASK_APP = "app.py"
-flask run
+flask run --host=0.0.0.0 --port=8000
