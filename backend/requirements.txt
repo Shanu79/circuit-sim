@@ -5,3 +5,4 @@ matplotlib==3.8.1
 numpy==1.26.4
 python-dotenv==1.0.1
 sympy==1.12
+Gunicorn
