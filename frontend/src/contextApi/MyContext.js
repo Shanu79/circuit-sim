@@ -122,7 +122,7 @@ let temp = {};
     frequency: frequency
   };
 
-fetch('http://localhost:5000/', {
+fetch('https://circuit-sim.onrender.com/', {
   method: 'POST', // or 'GET' or any other HTTP method you need
   headers: {
     'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ fetch('http://localhost:5000/', {
 }
 
 const viewSimulation = (analysisType) => {
-  const apiUrl = `http://localhost:5000/get-images/${analysisType}`;
+  const apiUrl = `https://circuit-sim.onrender.com/get-images/${analysisType}`;
   
   fetch(apiUrl)
     .then(response => response.json())
@@ -150,7 +150,7 @@ const viewSimulation = (analysisType) => {
         popup.document.write('<html><head><title>Simulation Results</title></head><body>');
         data.forEach(item => {
           popup.document.write(`<h2>${item.description}</h2>`);
-          popup.document.write(`<img src="http://localhost:5000${item.url}" alt="${item.description}" style="width:100%">`);
+          popup.document.write(`<img src="https://circuit-sim.onrender.com${item.url}" alt="${item.description}" style="width:100%">`);
         });
         popup.document.write('</body></html>');
         popup.document.close();

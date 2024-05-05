@@ -397,7 +397,18 @@ const CircuitCanvas = () => {
                 boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)"
              }}
             >
-            <span>{temp[LineCurrentId.slice(0)]}: {valMap.get(LineCurrentId) || "no value"} V</span>
+            <span>
+              {`${temp[LineCurrentId.slice(0)]}: ${valMap.get(LineCurrentId) || "no value"} ${
+                (() => {
+                  const firstChar = LineCurrentId.slice(0, 1);
+                  if (firstChar === 'A' || firstChar==="V") return 'V';
+
+                  if (firstChar === 'R') return 'Ohms'; // Checks for 'R'
+                  if (firstChar === 'C') return 'F'; // Checks for 'C'
+                  return 'H'; // Default case
+                })()
+              }`}
+            </span>
             <br></br>
             { // Check if simData is available before attempting to access its properties
               simData && (
