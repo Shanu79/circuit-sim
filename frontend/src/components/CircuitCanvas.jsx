@@ -386,13 +386,15 @@ const CircuitCanvas = () => {
           )}
             <div
              style={{
-              position: "absolute",
-              left: `${lineCurrentPos.x - 10}px`,
-              top: `${lineCurrentPos.y - 40 }px`,
-              backgroundColor: "rgba(255, 255, 255, 0.9)",
-              padding: "5px",
-              borderRadius: "5px",
-              boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)",
+                position: "fixed",
+                right: "50px",    // Adjust this value to increase or decrease the right margin
+                top: "50px",      // Adjust this value to increase or decrease the top margin
+                backgroundColor: "rgba(255, 255, 255, 0.9)",
+                width: "150px",
+                height: "150px",
+                padding: "20px",
+                borderRadius: "5px",
+                boxShadow: "0px 0px 5px 0px rgba(0, 0, 0, 0.5)"
              }}
             >
             <span>{temp[LineCurrentId.slice(0)]}: {valMap.get(LineCurrentId) || "no value"} V</span>
@@ -407,7 +409,6 @@ const CircuitCanvas = () => {
               )
             }
           </div>
-          )
         </div>
       </CircuitBoard >
 
