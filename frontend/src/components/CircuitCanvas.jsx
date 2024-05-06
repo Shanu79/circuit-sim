@@ -439,13 +439,12 @@ const CircuitCanvas = () => {
                         <span>I: {simData["current"][`I_${temp[LineCurrentId.slice(0)]}`]} A</span>
                       </>
                     );
-                  } else {
+                  } else if(firstChar==='V') {
                     return (
                       <>
-                        <span>{firstChar}: {valMap.get(LineCurrentId) || "no value"}</span>
-                        {firstChar === 'V' ? null : (
-                          <span> current: {simData["node_voltages"] ? getCurrent(LineCurrentId) + ' A' : ''}</span>
-                        )}
+                        <span> I: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]}</span>
+                        <br/>
+                        <span> I: {simData["voltages"] ? getCurrent(LineCurrentId) + ' A' : ''}</span>
                       </>
                     );
                   }
