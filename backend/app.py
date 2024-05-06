@@ -77,8 +77,20 @@ def simulate():
 
         if analysisType == "dc":
             # Placeholder for DC Analysis
-            node_voltages = {f"Node {i}": "0 V" for i in range(1, numberOfNodes+1)}
-            current = {}
+            a = Circuit(cctt)
+            node_voltages_dict = {}
+            for i in range(numberOfNodes):
+                key = "Node "+str(i)  # Create a key based on the loop variable
+            
+                #  value = str(a[i].V(s)) #For Ac analysis
+                value = str(-a[i].v)
+                print(value)
+            
+                # Assign the value to the key in the dictionary
+                node_voltages_dict[key] = value + " V"
+
+                print(node_voltages_dict)
+                node_voltages=node_voltages_dict
         elif analysisType == "ac":
             node_voltages, current = run_ac_analysis()
             app.config['IMAGES'] = image_files

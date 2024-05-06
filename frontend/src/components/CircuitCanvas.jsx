@@ -253,11 +253,26 @@ const CircuitCanvas = () => {
       return parseFloat(input);
     }
   }
- const getCurrent = (lineId) =>{
+  const getCurrent = (lineId) =>{
+    const node1 = updatedNodes.get(lineId.split('_')[1]);
+    const node2 = updatedNodes.get(lineId.split('_')[2]);
+    let current = 0
+    if(simData){
+      const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2) 
+      const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2) 
+    
+      current = (evaluateString(node_1_Voltage) - evaluateString(node_2_Voltage)) / Number(valMap.get(lineId))
+      console.log(node_1_Voltage, node_2_Voltage)
+    }
   
-  return 0
-
- }
+   
+    
+    // console.log(updatedNodes.get(lineId.split('_')[2]))
+    console.log(valMap.get(lineId))
+    console.log(current)
+    return Math.round(current * 100 ) / 100
+  
+   }
 
   return (
     <Container>
@@ -410,15 +425,34 @@ const CircuitCanvas = () => {
               }`}
             </span>
             <br></br>
-            { // Check if simData is available before attempting to access its properties
-              simData && (
-                <>
-                  <span> V: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]} V</span>
-                  <br></br>
-                  <span> I: {simData["current"][`I_${temp[LineCurrentId.slice(0)]}`]} A</span>
-                </>
-              )
-            }
+            {
+          // Check if simData is available before attempting to access its properties
+            simData && (
+              <>
+                {(() => {
+                  const firstChar = LineCurrentId.slice(0, 1);
+                  if (firstChar === 'A') {
+                    return (
+                      <>
+                        <span>V: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]} V</span>
+                        <br />
+                        <span>I: {simData["current"][`I_${temp[LineCurrentId.slice(0)]}`]} A</span>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <>
+                        <span>{firstChar}: {valMap.get(LineCurrentId) || "no value"}</span>
+                        {firstChar === 'V' ? null : (
+                          <span> current: {simData["node_voltages"] ? getCurrent(LineCurrentId) + ' A' : ''}</span>
+                        )}
+                      </>
+                    );
+                  }
+                })()}
+              </>
+            )
+          }
           </div>
         </div>
       </CircuitBoard >
