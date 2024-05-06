@@ -1,4 +1,3 @@
-import { getValue } from "@testing-library/user-event/dist/utils";
 import React, { createContext, useContext, useEffect, useState} from "react";
 // import * as d3 from 'd3'
 
@@ -10,7 +9,7 @@ export const ContextProvider = ({ children }) => {
   const [selectedLine, setSelectedLine] = useState();
   const [selectedComponent, setSelectedComponent] = useState('W')
   const [valMap, setValMap] = useState(new Map());
-  const [imageSrc, setImageSrc] = useState('');
+  // const [imageSrc, setImageSrc] = useState('');
 
   const [selectedNodes, setSelectedNodes] = useState(new Map()); // to select nodes that are part of the schematics
 
@@ -109,11 +108,6 @@ let temp = {};
   // Now including the nodes and value in a specific format for each component
   const netstring = JSON.stringify({components: components}, null, 2); // Pretty print JSON
 
-  // Send the JSON string to your backend
-
-
-  // console.log(netstring);
-  // console.log(updatedNodes);
 
   const body = { 
     netList: netstring, 
@@ -150,7 +144,7 @@ const viewSimulation = (analysisType) => {
         popup.document.write('<html><head><title>Simulation Results</title></head><body>');
         data.forEach(item => {
           popup.document.write(`<h2>${item.description}</h2>`);
-          popup.document.write(`<img src="https://circuit-sim.onrender.com${item.url}" alt="${item.description}" style="width:100%">`);
+          popup.document.write(`<img src="https://circuit-sim.onrender.com/${item.url}" alt="${item.description}" style="width:100%">`);
         });
         popup.document.write('</body></html>');
         popup.document.close();

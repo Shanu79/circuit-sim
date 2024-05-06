@@ -53,7 +53,6 @@ const CircuitCanvas = () => {
     selectedNodes,
     setSelectedNodes,
     updatedNodes,
-    setUpdatedNodes,
     sendSimulationData, // Updated to use the new function name
     viewSimulation,
     analysisType,
@@ -124,8 +123,6 @@ const CircuitCanvas = () => {
     setNodeVoltagePosition({ x: event.clientX, y: event.clientY });
     setNodeVoltageVisible(true);
     setNodeVoltageDotId(dotId);
-
-    
   };
 
   const hideNodeVoltage = () => {
@@ -240,39 +237,6 @@ const CircuitCanvas = () => {
       })
     }
   };
-  function evaluateString(input) {
-    // Check if the string contains a fraction
-    if (input.includes('/')) {
-      const [numerator, denominator] = input.split('/').map(Number);
-    const result = (numerator / denominator);
-
-    // Round to exactly two decimal places
-    return result;
-    } else {
-      // If it's not a fraction, convert it to a number
-      return parseFloat(input);
-    }
-  }
-  const getCurrent = (lineId) =>{
-    const node1 = updatedNodes.get(lineId.split('_')[1]);
-    const node2 = updatedNodes.get(lineId.split('_')[2]);
-    let current = 0
-    if(simData){
-      const node_1_Voltage = simData["node_voltages"][`Node ${node1}`].slice(0,-2) 
-      const node_2_Voltage = simData["node_voltages"][`Node ${node2}`].slice(0,-2) 
-    
-      current = (evaluateString(node_1_Voltage) - evaluateString(node_2_Voltage)) / Number(valMap.get(lineId))
-      console.log(node_1_Voltage, node_2_Voltage)
-    }
-  
-   
-    
-    // console.log(updatedNodes.get(lineId.split('_')[2]))
-    console.log(valMap.get(lineId))
-    console.log(current)
-    return Math.round(current * 100 ) / 100
-  
-   }
 
   return (
     <Container>
@@ -417,10 +381,9 @@ const CircuitCanvas = () => {
                 (() => {
                   const firstChar = LineCurrentId.slice(0, 1);
                   if (firstChar === 'A' || firstChar==="V") return 'V';
-
                   if (firstChar === 'R') return 'Ohms'; // Checks for 'R'
                   if (firstChar === 'C') return 'F'; // Checks for 'C'
-                  return 'H'; // Default case
+                  if (firstChar=== 'L') return 'H';
                 })()
               }`}
             </span>
@@ -430,8 +393,6 @@ const CircuitCanvas = () => {
             simData && (
               <>
                 {(() => {
-                  const firstChar = LineCurrentId.slice(0, 1);
-                  if (firstChar === 'A') {
                     return (
                       <>
                         <span>V: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]} V</span>
@@ -439,15 +400,7 @@ const CircuitCanvas = () => {
                         <span>I: {simData["current"][`I_${temp[LineCurrentId.slice(0)]}`]} A</span>
                       </>
                     );
-                  } else if(firstChar==='V') {
-                    return (
-                      <>
-                        <span> I: {simData["voltages"][`V_${temp[LineCurrentId.slice(0)]}`]}</span>
-                        <br/>
-                        <span> I: {simData["voltages"] ? getCurrent(LineCurrentId) + ' A' : ''}</span>
-                      </>
-                    );
-                  }
+                  
                 })()}
               </>
             )

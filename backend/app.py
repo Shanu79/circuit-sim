@@ -7,6 +7,7 @@ import sympy as sp  # For more control over symbolic expressions
 import re
 from transient_analysis import run_transient_analysis
 from ac_analysis import run_ac_analysis
+from dc_analysis import run_dc_analysis
 import os
 from dotenv import load_dotenv
 
@@ -76,21 +77,7 @@ def simulate():
         }.get(analysisType, [])
 
         if analysisType == "dc":
-            # Placeholder for DC Analysis
-            a = Circuit(cctt)
-            node_voltages_dict = {}
-            for i in range(numberOfNodes):
-                key = "Node "+str(i)  # Create a key based on the loop variable
-            
-                #  value = str(a[i].V(s)) #For Ac analysis
-                value = str(-a[i].v)
-                print(value)
-            
-                # Assign the value to the key in the dictionary
-                node_voltages_dict[key] = value + " V"
-
-                print(node_voltages_dict)
-                node_voltages=node_voltages_dict
+            node_voltages, current = run_dc_analysis()
         elif analysisType == "ac":
             node_voltages, current = run_ac_analysis()
             app.config['IMAGES'] = image_files
